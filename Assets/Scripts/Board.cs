@@ -3,20 +3,23 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class Board : MonoSingleton<Board>
+public class Board : NetworkBehaviour
 {
 	#region Variables
 	[HideInInspector] public King WhiteKing;
 	[HideInInspector] public King BlackKing;
 	[HideInInspector] public List<Chessman> WhiteChessmen = new List<Chessman>();
 	[HideInInspector] public List<Chessman> BlackChessmen = new List<Chessman>();
-
 	public Dictionary<int, Transform> AllChessmen = new Dictionary<int, Transform>();
 
 	public Cell[,] Cells { get; private set; }
 
-	const int CELL_SIZE = 9;
+	public bool WhiteMoves = true;
 
+	const int CELL_SIZE = 9;
+	#endregion
+
+	#region Helper Methods
 	public int GetActualPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
 
 	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
@@ -41,9 +44,15 @@ public class Board : MonoSingleton<Board>
 	#endregion
 
 	#region Initialization
+	public override void OnStartServer()
+	{
+		Debug.Log("OnStartServer()");
+
+		Init();
+	}
+
 	public void Init()
 	{
-		print("Board Init");
 		Init_FindChessmen();
 		Init_Cells();
 	}
@@ -55,8 +64,10 @@ public class Board : MonoSingleton<Board>
 		WhiteChessmen = chessmen.Where(chessman => chessman.isWhite).ToList();
 		BlackChessmen = chessmen.Where(chessman => !chessman.isWhite).ToList();
 
-		WhiteKing = FindObjectsOfType<King>().First(k => k.isWhite);
-		BlackKing = FindObjectsOfType<King>().First(k => !k.isWhite);
+		King[] kings = FindObjectsOfType<King>();
+
+		WhiteKing = kings.First(k => k.isWhite);
+		BlackKing = kings.First(k => !k.isWhite);
 
 		foreach (var c in chessmen)
 			AllChessmen.Add(c.transform.GetInstanceID(), c.transform);
@@ -75,6 +86,7 @@ public class Board : MonoSingleton<Board>
 	}
 	#endregion
 
+	// Also sets the previous cell as Empty.
 	void SetCell(int startY, int startX, int endY, int endX, bool isWhite, King kingComponent)
 	{
 		Cells[startY, startX] = Cell.Empty;
@@ -94,7 +106,8 @@ public class Board : MonoSingleton<Board>
 
 		foreach (var p in possibleMoves)
 		{
-			int objectIndex; float height_Y = 1;
+			int objectIndex;
+			float height_Y = 1;
 
 			if (p.isCastle)
 				objectIndex = 4;
@@ -110,8 +123,10 @@ public class Board : MonoSingleton<Board>
 					case "Knight": height_Y = 13; break;
 					case "Bishop": height_Y = 14; break;
 					case "Queen": height_Y = 13.5f; break;
-					case "King": Debug.LogError("DisplayValidMoves:: Entered King tag in switch chessman.tag"); break;
-					default: Debug.LogError("DisplayValidMoves:: No Such Tag Found"); break;
+					case "King": Debug.LogError("DisplayValidMoves:: Entered King tag in switch chessman.tag");
+						break;
+					default: Debug.LogError("DisplayValidMoves:: Wrong tag");
+						break;
 				}
 
 				objectIndex = 1;
@@ -120,11 +135,11 @@ public class Board : MonoSingleton<Board>
 			else
 				objectIndex = 0;
 
+			//Sets the highlighter at correct place
 			GameObject highlighter = ObjectPooler.SharedInstance.GetPooledObject(objectIndex);
-			highlighter.SetActive(true);
-
 			Vector3 newPos = new Vector3(GetActualPos(p.x), height_Y, GetActualPos(p.y));
 			highlighter.transform.position = newPos;
+			highlighter.SetActive(true);
 		}
 	}
 
@@ -139,11 +154,20 @@ public class Board : MonoSingleton<Board>
 
 	public void MakeMove(Chessman c, NetworkIdentity networkIdentity, int z, int x)
 	{
+		WhiteMoves = !WhiteMoves;
 		SetCell(c.Y, c.X, GetBoardPos(z), GetBoardPos(x), c.isWhite, c as King);
 		c.OnMove(z, x);
 
-		Server.Instance.RpcMoveFigure(networkIdentity, x, z);
+		RpcMoveFigure(networkIdentity, x, z);
 
 		RemoveHighlighters();
+	}
+
+	[ClientRpc]
+	public void RpcMoveFigure(NetworkIdentity identity, int x, int z)
+	{
+		Debug.Log("RpcMoveFigure()");
+
+		identity.transform.position = new Vector3(x, 0, z);
 	}
 }

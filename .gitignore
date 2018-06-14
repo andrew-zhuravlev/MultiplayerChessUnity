@@ -6,6 +6,8 @@
 Assets/AssetStoreTools*
 
 .idea
+Assets/UnityPark
+.uEcho
 
 # Visual Studio cache directory
 .vs/

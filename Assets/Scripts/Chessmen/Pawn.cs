@@ -41,7 +41,7 @@ public class Pawn : Chessman
 
 		bool isValidMove = validKillMove || validForwardMove;
 		if (checkFriendlyKingSafety)
-			isValidMove = isValidMove && !(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
+			isValidMove = isValidMove && !(isWhite ? FindObjectOfType<Board>().WhiteKing : FindObjectOfType<Board>().BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
 
 		if (!isValidMove)
 			return;
@@ -61,6 +61,7 @@ public class Pawn : Chessman
 
 	void TurnIntoQueen()
 	{
+		//TODO:
 		//Something to do with networking
 		//Instantiate(isWhite ? ObjectPooler.SharedInstance.GetPooledObject(2) : ObjectPooler.SharedInstance.GetPooledObject(3));
 

@@ -6,22 +6,16 @@ public class Player : NetworkBehaviour
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessmanNetworkIdentity;
 
-	bool isWhite;
-	
-	void Start()
-	{
-		isWhite = isServer ? true : false;
-
-		print(isWhite);
-	}
-
 	void Update()
 	{
-		if (isWhite != Server.Instance.WhiteMoves)
+		if (isServer != FindObjectOfType<Board>().WhiteMoves)
 			return;
 
-		CheckSelection();
-		CheckMovement();
+		if (selectedChessman == null)
+			CheckSelection();
+
+		else
+			CheckMovement();
 	}
 
 	void CheckSelection()
@@ -40,16 +34,16 @@ public class Player : NetworkBehaviour
 			else if (selectedChessman == chessmanComponent)
 			{
 				selectedChessman = null;
-				Board.Instance.RemoveHighlighters();
+				FindObjectOfType<Board>().RemoveHighlighters();
 			}
 
-			else if (isWhite == chessmanComponent.isWhite)
+			else if (isServer == chessmanComponent.isWhite)
 			{
-				Board.Instance.RemoveHighlighters();
+				FindObjectOfType<Board>().RemoveHighlighters();
 				selectedChessman = chessmanComponent;
 				selectedChessmanNetworkIdentity = hit.collider.GetComponent<NetworkIdentity>();
 
-				Board.Instance.DisplayHighlighters(chessmanComponent.GetValidMoves());
+				FindObjectOfType<Board>().DisplayHighlighters(chessmanComponent.GetValidMoves());
 			}
 		}
 	}
@@ -64,7 +58,7 @@ public class Player : NetworkBehaviour
 		{
 			int x = (int)hit.transform.position.x, z = (int)hit.transform.position.z;
 
-			Board.Instance.MakeMove(selectedChessman, selectedChessmanNetworkIdentity, z, x);
+			FindObjectOfType<Board>().MakeMove(selectedChessman, selectedChessmanNetworkIdentity, z, x);
 
 			selectedChessman = null;
 		}
