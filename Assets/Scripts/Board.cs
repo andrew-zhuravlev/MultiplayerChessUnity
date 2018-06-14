@@ -14,6 +14,7 @@ public class Board : NetworkBehaviour
 
 	public Cell[,] Cells { get; private set; }
 
+	[SyncVar]
 	public bool WhiteMoves = true;
 
 	const int CELL_SIZE = 9;
