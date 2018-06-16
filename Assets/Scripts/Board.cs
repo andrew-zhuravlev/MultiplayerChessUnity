@@ -5,15 +5,24 @@ using UnityEngine.Networking;
 
 public class Board : NetworkBehaviour
 {
+	#region Singleton
+	public static Board Instance { get; private set; }
+	void Start()
+	{
+		Instance = this;
+	}
+	#endregion
+
 	#region Variables
-	public static King WhiteKing;
-	public static King BlackKing;
-	public static List<Chessman> WhiteChessmen = new List<Chessman>();
-	public static List<Chessman> BlackChessmen = new List<Chessman>();
-	public Dictionary<int, Transform> AllChessmen = new Dictionary<int, Transform>();
+	public King WhiteKing { get; private set; }
+	public King BlackKing { get; private set; }
+	public List<Chessman> WhiteChessmen { get; private set; }
+	public List<Chessman> BlackChessmen { get; private set; }
+	public Dictionary<int, Transform> AllChessmen { get; private set; }
 
-	public static Cell[,] Cells { get; private set; }
+	public Cell[,] Cells { get; private set; }
 
+	//TODO: Make client handler object.
 	public bool WhiteMoves = true;
 
 	const int CELL_SIZE = 9;
@@ -36,7 +45,7 @@ public class Board : NetworkBehaviour
 		return null;
 	}
 
-	public static bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
+	public bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
 	{
 		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
@@ -47,21 +56,34 @@ public class Board : NetworkBehaviour
 	public void Init()
 	{
 		Init_Cells();
-		Init_FindChessmen();
+		Init_Chessmen();
 	}
 
-	void Init_FindChessmen()
+	void Init_Chessmen()
 	{
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
 
-		//TODO: Есть один лишний проход, переделать в фор.
-		WhiteChessmen = chessmen.Where(chessman => chessman.isWhite).ToList();
-		BlackChessmen = chessmen.Where(chessman => !chessman.isWhite).ToList();
+		WhiteChessmen = new List<Chessman>();
+		BlackChessmen = new List<Chessman>();
+		AllChessmen = new Dictionary<int, Transform>();
+
+		for (int i = 0; i < chessmen.Length; i++)
+		{
+			if (chessmen[i].isWhite)
+				WhiteChessmen.Add(chessmen[i]);
+			else
+				BlackChessmen.Add(chessmen[i]);
+		}
 
 		King[] kings = FindObjectsOfType<King>();
 
-		WhiteKing = kings.First(k => k.isWhite);
-		BlackKing = kings.First(k => !k.isWhite);
+		for(int i = 0; i < 2; i++)
+		{
+			if (kings[i].isWhite)
+				WhiteKing = kings[i];
+			else
+				BlackKing = kings[i];
+		}
 
 		foreach (var c in chessmen)
 			AllChessmen.Add(c.transform.GetInstanceID(), c.transform);
@@ -87,12 +109,6 @@ public class Board : NetworkBehaviour
 
 		if (isKing)
 			Cells[endY, endX] |= Cell.King;
-	}
-
-	// Also sets the previous cell as Empty.
-	public void SetCell(int startY, int startX, int endY, int endX, bool isWhite, King kingComponent)
-	{
-		SetCell(startY, startX, endY, endX, isWhite, kingComponent != null);
 	}
 
 	public void DisplayHighlighters(Move[] possibleMoves)
@@ -144,6 +160,7 @@ public class Board : NetworkBehaviour
 		}
 	}
 
+	//TODO: How does it remove kill highlighters??
 	public void RemoveHighlighters()
 	{
 		foreach (var moveHighlighter in GameObject.FindGameObjectsWithTag("Move Highlighter"))

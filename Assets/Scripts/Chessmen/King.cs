@@ -7,22 +7,22 @@ public class King : Chessman
 
 	List<Chessman> Enemies
 	{
-		get { return isWhite ? Board.BlackChessmen : Board.WhiteChessmen; }
+		get { return isWhite ? Board.Instance.BlackChessmen : Board.Instance.WhiteChessmen; }
 	}
 
 	public override void OnMove(int z, int x)
 	{
-		if (Y - FindObjectOfType<Board>().GetBoardPos(z) == 0)
+		if (Y - Board.Instance.GetBoardPos(z) == 0)
 		{
-			int xDelta = FindObjectOfType<Board>().GetBoardPos(x) - X;
+			int xDelta = Board.Instance.GetBoardPos(x) - X;
 			int row = isWhite ? 0 : 7;
 
 			//TODO: Fix this.
 			//if (xDelta == -3)
-			//	FindObjectOfType<Board>().MakeMove(FindObjectOfType<Board>().GetChessmanByBoardIndex(row, 0), FindObjectOfType<Board>().GetActualPos(row), FindObjectOfType<Board>().GetActualPos(2));
+			//	Board.Instance.MakeMove(Board.Instance.GetChessmanByBoardIndex(row, 0), Board.Instance.GetActualPos(row), Board.Instance.GetActualPos(2));
 
 			//else if (xDelta == 2)
-			//	FindObjectOfType<Board>().MakeMove(FindObjectOfType<Board>().GetChessmanByBoardIndex(row, 7), FindObjectOfType<Board>().GetActualPos(row), FindObjectOfType<Board>().GetActualPos(5));
+			//	Board.Instance.MakeMove(Board.Instance.GetChessmanByBoardIndex(row, 7), Board.Instance.GetActualPos(row), Board.Instance.GetActualPos(5));
 		}
 
 		hasMoved = true;
@@ -67,30 +67,30 @@ public class King : Chessman
 			return;
 
 		int row = isWhite ? 0 : 7;
-		Rook rook = FindObjectOfType<Board>().GetChessmanByBoardIndex(row, 7) as Rook;
+		Rook rook = Board.Instance.GetChessmanByBoardIndex(row, 7) as Rook;
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& Board.Cells[row, 5] == Cell.Empty
-			&& Board.Cells[row, 6] == Cell.Empty
+			&& Board.Instance.Cells[row, 5] == Cell.Empty
+			&& Board.Instance.Cells[row, 6] == Cell.Empty
 			
-			&& !Board.CellIsInDanger(row, 5, !isWhite)
-			&& !Board.CellIsInDanger(row, 6, !isWhite))
+			&& !Board.Instance.CellIsInDanger(row, 5, !isWhite)
+			&& !Board.Instance.CellIsInDanger(row, 6, !isWhite))
 		{
 			validMoves.Add(new Move(row, 6, isKill: false, isCastle: true));
 		}
 
-		rook = FindObjectOfType<Board>().GetChessmanByBoardIndex(row, 0) as Rook;
+		rook = Board.Instance.GetChessmanByBoardIndex(row, 0) as Rook;
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& Board.Cells[row, 1] == Cell.Empty
-			&& Board.Cells[row, 2] == Cell.Empty
-			&& Board.Cells[row, 3] == Cell.Empty
+			&& Board.Instance.Cells[row, 1] == Cell.Empty
+			&& Board.Instance.Cells[row, 2] == Cell.Empty
+			&& Board.Instance.Cells[row, 3] == Cell.Empty
 			
-			&& !Board.CellIsInDanger(row, 1, !isWhite)
-			&& !Board.CellIsInDanger(row, 2, !isWhite)
-			&& !Board.CellIsInDanger(row, 3, !isWhite))
+			&& !Board.Instance.CellIsInDanger(row, 1, !isWhite)
+			&& !Board.Instance.CellIsInDanger(row, 2, !isWhite)
+			&& !Board.Instance.CellIsInDanger(row, 3, !isWhite))
 		{
 			validMoves.Add(new Move(row, 1, isKill: false, isCastle: true));
 		}
@@ -98,16 +98,16 @@ public class King : Chessman
 
 	public bool IsUnderThreat()
 	{
-		return ToBeKilled(Board.Cells, Enemies);
+		return ToBeKilled(Board.Instance.Cells, Enemies);
 	}
 
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)
 	{
-		Cell[,] boardAfterMove = (Cell[,])Board.Cells.Clone();
+		Cell[,] boardAfterMove = (Cell[,])Board.Instance.Cells.Clone();
 		List<Chessman> enemies = new List<Chessman>(Enemies);
 
 		if ((boardAfterMove[endY, endX] & Enemy) == Enemy)
-			enemies.Remove(FindObjectOfType<Board>().GetChessmanByBoardIndex(endY, endX));
+			enemies.Remove(Board.Instance.GetChessmanByBoardIndex(endY, endX));
 
 		boardAfterMove[startY, startX] = Cell.Empty;
 		boardAfterMove[endY, endX] = isWhite ? Cell.WhiteFigure : Cell.BlackFigure;

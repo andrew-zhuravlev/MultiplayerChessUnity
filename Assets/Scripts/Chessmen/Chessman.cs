@@ -5,8 +5,8 @@ public abstract class Chessman : MonoBehaviour
 {
 	public bool isWhite;
 
-	public int Y { get { return FindObjectOfType<Board>().GetBoardPos((int)transform.position.z); } }
-	public int X { get { return FindObjectOfType<Board>().GetBoardPos((int)transform.position.x); } }
+	public int Y { get { return Board.Instance.GetBoardPos((int)transform.position.z); } }
+	public int X { get { return Board.Instance.GetBoardPos((int)transform.position.x); } }
 	
 	public bool ThreatForEnemyKing(Cell[,] newBoard)
 	{
@@ -16,7 +16,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public bool CanKillCell(int y, int x)
 	{
-		return GetValidMoves(checkFriendlyKingSafety: false, board: Board.Cells)
+		return GetValidMoves(checkFriendlyKingSafety: false, board: Board.Instance.Cells)
 			.Any(move => move.y == y && move.x == x);
 	}
 
@@ -34,7 +34,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public Move[] GetValidMoves()
 	{
-		return GetValidMoves(checkFriendlyKingSafety: true, board: Board.Cells);
+		return GetValidMoves(checkFriendlyKingSafety: true, board: Board.Instance.Cells);
 	}
 
 	public virtual void OnMove(int z, int x) { }

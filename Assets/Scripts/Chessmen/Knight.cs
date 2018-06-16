@@ -25,7 +25,7 @@ public class Knight : Chessman
 	void CheckMove(int endY, int endX, List<Move> result, bool checkFriendlyKingSafety, Cell[,] board)
 	{
 		if (endY < 0 || endY > 7 || endX < 0 || endX > 7 || (board[endY, endX] & Friend) == Friend || !(checkFriendlyKingSafety ?
-			!(isWhite ? Board.WhiteKing : Board.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null) : true))
+			!(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null) : true))
 			return;
 
 		if (board[endY, endX] == Cell.Empty)

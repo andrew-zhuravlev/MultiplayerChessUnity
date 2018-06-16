@@ -18,7 +18,7 @@ public class CellsHelperWindow : EditorWindow
 
 	void OnGUI()
 	{
-		if (EditorApplication.isPlaying && Board.Cells != null)
+		if (EditorApplication.isPlaying && Board.Instance.Cells != null)
 		{
 			if (GUILayout.Button("Update the Cells") || update)
 				UpdateCells();
@@ -30,19 +30,19 @@ public class CellsHelperWindow : EditorWindow
 
 	public static void DisplayCells()
 	{
-		for (int y = Board.Cells.GetLength(0) - 1; y >= 0; y--)
+		for (int y = Board.Instance.Cells.GetLength(0) - 1; y >= 0; y--)
 		{
 			EditorGUILayout.BeginHorizontal();
 
-			for (int x = 0; x < Board.Cells.GetLength(1); x++)
+			for (int x = 0; x < Board.Instance.Cells.GetLength(1); x++)
 			{
-				if (Board.Cells[y, x] == Cell.Empty)
+				if (Board.Instance.Cells[y, x] == Cell.Empty)
 					GUI.color = Color.gray;
 
-				else if ((Board.Cells[y, x] & Cell.King) == Cell.King)
+				else if ((Board.Instance.Cells[y, x] & Cell.King) == Cell.King)
 					GUI.color = Color.green;
 
-				else if (Board.Cells[y, x] == Cell.BlackFigure)
+				else if (Board.Instance.Cells[y, x] == Cell.BlackFigure)
 					GUI.color = Color.black;
 
 				else
@@ -66,16 +66,16 @@ public class CellsHelperWindow : EditorWindow
 				if (Physics.Raycast(ray, out hit, 20, LayerMask.GetMask("Chessmen")))
 				{
 					if (hit.collider.GetComponent<Chessman>().isWhite)
-						Board.Cells[y, x] = Cell.WhiteFigure;
+						Board.Instance.Cells[y, x] = Cell.WhiteFigure;
 
 					else
-						Board.Cells[y, x] = Cell.BlackFigure;
+						Board.Instance.Cells[y, x] = Cell.BlackFigure;
 
 					if (hit.collider.GetComponent<King>() != null)
-						Board.Cells[y, x] |= Cell.King;
+						Board.Instance.Cells[y, x] |= Cell.King;
 				}
 
-				else Board.Cells[y, x] = Cell.Empty;
+				else Board.Instance.Cells[y, x] = Cell.Empty;
 			}
 
 		update = false;

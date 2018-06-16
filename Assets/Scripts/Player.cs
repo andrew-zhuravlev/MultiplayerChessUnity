@@ -6,25 +6,17 @@ public class Player : NetworkBehaviour
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessman_NetworkIdentity;
 
-	Board b;
-
 	void Start()
 	{
 		if (!isLocalPlayer)
 			return;
 
-		Debug.Log("Start();");
-		b = FindObjectOfType<Board>();
-		b.Init();
+		Board.Instance.Init();
 	}
 
 	void Update()
 	{
-		if (!isLocalPlayer)
-			return;
-
-		//isServer should definitely be fixed.
-		if (!isLocalPlayer || isServer != b.WhiteMoves)
+		if (!isLocalPlayer || isServer != Board.Instance.WhiteMoves)
 			return;
 
 		CheckSelection();
@@ -47,16 +39,16 @@ public class Player : NetworkBehaviour
 			else if (selectedChessman == chessmanComponent)
 			{
 				selectedChessman = null;
-				FindObjectOfType<Board>().RemoveHighlighters();
+				Board.Instance.RemoveHighlighters();
 			}
 
 			else if (isServer == chessmanComponent.isWhite)
 			{
-				FindObjectOfType<Board>().RemoveHighlighters();
+				Board.Instance.RemoveHighlighters();
 				selectedChessman = chessmanComponent;
 				selectedChessman_NetworkIdentity = hit.collider.GetComponent<NetworkIdentity>();
 
-				FindObjectOfType<Board>().DisplayHighlighters(chessmanComponent.GetValidMoves());
+				Board.Instance.DisplayHighlighters(chessmanComponent.GetValidMoves());
 			}
 		}
 	}
@@ -68,16 +60,13 @@ public class Player : NetworkBehaviour
 
 		RaycastHit hit;
 		if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Highlighters")))
-		{
 			MakeMove(selectedChessman_NetworkIdentity, (int)hit.transform.position.z, (int)hit.transform.position.x);
-		}
 	}
 
-	//TODO: Fix problem: x and z are swapped.
 	public void MakeMove(NetworkIdentity identity, int z, int x)
 	{
 		CmdMoveFigure(identity, selectedChessman.Y, selectedChessman.X, z, x, selectedChessman.isWhite, (selectedChessman as King) != null);
-		FindObjectOfType<Board>().RemoveHighlighters();
+		Board.Instance.RemoveHighlighters();
 	}
 
 	[Command]
@@ -91,14 +80,11 @@ public class Player : NetworkBehaviour
 	{
 		Debug.Log("RpcMoveFigure()");
 
-		FindObjectOfType<Board>().SetCell(fromZ, fromX, FindObjectOfType<Board>().GetBoardPos(z), FindObjectOfType<Board>().GetBoardPos(x), isWhite, isKing);
-
-		//Definitely change this;
-		identity.GetComponent<Chessman>().OnMove(z, x);
-
-		FindObjectOfType<Board>().WhiteMoves = !FindObjectOfType<Board>().WhiteMoves;
+		Board.Instance.SetCell(fromZ, fromX, Board.Instance.GetBoardPos(z), Board.Instance.GetBoardPos(x), isWhite, isKing);
+		Board.Instance.WhiteMoves = !Board.Instance.WhiteMoves;
 
 		identity.transform.position = new Vector3(x, 0, z);
+		identity.GetComponent<Chessman>().OnMove(z, x);
 
 		selectedChessman = null;
 		selectedChessman_NetworkIdentity = null;
