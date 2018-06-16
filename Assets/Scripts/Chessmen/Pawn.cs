@@ -41,16 +41,12 @@ public class Pawn : Chessman
 
 		bool isValidMove = validKillMove || validForwardMove;
 		if (checkFriendlyKingSafety)
-			isValidMove = isValidMove && !(isWhite ? FindObjectOfType<Board>().WhiteKing : FindObjectOfType<Board>().BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
+			isValidMove = isValidMove && !(isWhite ? Board.WhiteKing : Board.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
 
 		if (!isValidMove)
 			return;
 
-		if (validKillMove)
-			validMoves.Add(new Move(endY, endX, true, isCastle: false));
-
-		else
-			validMoves.Add(new Move(endY, endX, false, isCastle: false));
+		validMoves.Add(new Move(endY, endX, isKill: validKillMove, isCastle: false));
 	}
 
 	public override void OnMove(int z, int x)
@@ -64,6 +60,8 @@ public class Pawn : Chessman
 		//TODO:
 		//Something to do with networking
 		//Instantiate(isWhite ? ObjectPooler.SharedInstance.GetPooledObject(2) : ObjectPooler.SharedInstance.GetPooledObject(3));
+
+		//Probably use NetworkServer.Spawn(); or NetworkServer.SpawnWithClientAuthority();
 
 		Destroy(gameObject);
 	}

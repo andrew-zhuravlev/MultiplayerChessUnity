@@ -16,7 +16,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public bool CanKillCell(int y, int x)
 	{
-		return GetValidMoves(checkFriendlyKingSafety: false, board: FindObjectOfType<Board>().Cells)
+		return GetValidMoves(checkFriendlyKingSafety: false, board: Board.Cells)
 			.Any(move => move.y == y && move.x == x);
 	}
 
@@ -34,7 +34,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public Move[] GetValidMoves()
 	{
-		return GetValidMoves(checkFriendlyKingSafety: true, board: FindObjectOfType<Board>().Cells);
+		return GetValidMoves(checkFriendlyKingSafety: true, board: Board.Cells);
 	}
 
 	public virtual void OnMove(int z, int x) { }

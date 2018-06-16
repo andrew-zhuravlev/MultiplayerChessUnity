@@ -6,15 +6,14 @@ using UnityEngine.Networking;
 public class Board : NetworkBehaviour
 {
 	#region Variables
-	[HideInInspector] public King WhiteKing;
-	[HideInInspector] public King BlackKing;
-	[HideInInspector] public List<Chessman> WhiteChessmen = new List<Chessman>();
-	[HideInInspector] public List<Chessman> BlackChessmen = new List<Chessman>();
+	public static King WhiteKing;
+	public static King BlackKing;
+	public static List<Chessman> WhiteChessmen = new List<Chessman>();
+	public static List<Chessman> BlackChessmen = new List<Chessman>();
 	public Dictionary<int, Transform> AllChessmen = new Dictionary<int, Transform>();
 
-	public Cell[,] Cells { get; private set; }
+	public static Cell[,] Cells { get; private set; }
 
-	[SyncVar]
 	public bool WhiteMoves = true;
 
 	const int CELL_SIZE = 9;
@@ -37,7 +36,7 @@ public class Board : NetworkBehaviour
 		return null;
 	}
 
-	public bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
+	public static bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
 	{
 		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
@@ -45,23 +44,17 @@ public class Board : NetworkBehaviour
 	#endregion
 
 	#region Initialization
-	public override void OnStartServer()
-	{
-		Debug.Log("OnStartServer()");
-
-		Init();
-	}
-
 	public void Init()
 	{
-		Init_FindChessmen();
 		Init_Cells();
+		Init_FindChessmen();
 	}
 
 	void Init_FindChessmen()
 	{
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
 
+		//TODO: Есть один лишний проход, переделать в фор.
 		WhiteChessmen = chessmen.Where(chessman => chessman.isWhite).ToList();
 		BlackChessmen = chessmen.Where(chessman => !chessman.isWhite).ToList();
 
@@ -87,14 +80,19 @@ public class Board : NetworkBehaviour
 	}
 	#endregion
 
-	// Also sets the previous cell as Empty.
-	void SetCell(int startY, int startX, int endY, int endX, bool isWhite, King kingComponent)
+	public void SetCell(int startY, int startX, int endY, int endX, bool isWhite, bool isKing)
 	{
 		Cells[startY, startX] = Cell.Empty;
 		Cells[endY, endX] = (isWhite ? Cell.WhiteFigure : Cell.BlackFigure);
 
-		if (kingComponent != null)
+		if (isKing)
 			Cells[endY, endX] |= Cell.King;
+	}
+
+	// Also sets the previous cell as Empty.
+	public void SetCell(int startY, int startX, int endY, int endX, bool isWhite, King kingComponent)
+	{
+		SetCell(startY, startX, endY, endX, isWhite, kingComponent != null);
 	}
 
 	public void DisplayHighlighters(Move[] possibleMoves)
@@ -124,9 +122,11 @@ public class Board : NetworkBehaviour
 					case "Knight": height_Y = 13; break;
 					case "Bishop": height_Y = 14; break;
 					case "Queen": height_Y = 13.5f; break;
-					case "King": Debug.LogError("DisplayValidMoves:: Entered King tag in switch chessman.tag");
+					case "King":
+						Debug.LogError("DisplayValidMoves:: Entered King tag in switch chessman.tag");
 						break;
-					default: Debug.LogError("DisplayValidMoves:: Wrong tag");
+					default:
+						Debug.LogError("DisplayValidMoves:: Wrong tag");
 						break;
 				}
 
@@ -151,24 +151,5 @@ public class Board : NetworkBehaviour
 
 		foreach (var castleMoveHighlighter in GameObject.FindGameObjectsWithTag("Castle Move Highlighter"))
 			castleMoveHighlighter.SetActive(false);
-	}
-
-	public void MakeMove(Chessman c, NetworkIdentity networkIdentity, int z, int x)
-	{
-		WhiteMoves = !WhiteMoves;
-		SetCell(c.Y, c.X, GetBoardPos(z), GetBoardPos(x), c.isWhite, c as King);
-		c.OnMove(z, x);
-
-		RpcMoveFigure(networkIdentity, x, z);
-
-		RemoveHighlighters();
-	}
-
-	[ClientRpc]
-	public void RpcMoveFigure(NetworkIdentity identity, int x, int z)
-	{
-		Debug.Log("RpcMoveFigure()");
-
-		identity.transform.position = new Vector3(x, 0, z);
 	}
 }

@@ -7,7 +7,7 @@ public class King : Chessman
 
 	List<Chessman> Enemies
 	{
-		get { return isWhite ? FindObjectOfType<Board>().BlackChessmen : FindObjectOfType<Board>().WhiteChessmen; }
+		get { return isWhite ? Board.BlackChessmen : Board.WhiteChessmen; }
 	}
 
 	public override void OnMove(int z, int x)
@@ -71,11 +71,11 @@ public class King : Chessman
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& FindObjectOfType<Board>().Cells[row, 5] == Cell.Empty
-			&& FindObjectOfType<Board>().Cells[row, 6] == Cell.Empty
+			&& Board.Cells[row, 5] == Cell.Empty
+			&& Board.Cells[row, 6] == Cell.Empty
 			
-			&& !FindObjectOfType<Board>().CellIsInDanger(row, 5, !isWhite)
-			&& !FindObjectOfType<Board>().CellIsInDanger(row, 6, !isWhite))
+			&& !Board.CellIsInDanger(row, 5, !isWhite)
+			&& !Board.CellIsInDanger(row, 6, !isWhite))
 		{
 			validMoves.Add(new Move(row, 6, isKill: false, isCastle: true));
 		}
@@ -84,13 +84,13 @@ public class King : Chessman
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& FindObjectOfType<Board>().Cells[row, 1] == Cell.Empty
-			&& FindObjectOfType<Board>().Cells[row, 2] == Cell.Empty
-			&& FindObjectOfType<Board>().Cells[row, 3] == Cell.Empty
+			&& Board.Cells[row, 1] == Cell.Empty
+			&& Board.Cells[row, 2] == Cell.Empty
+			&& Board.Cells[row, 3] == Cell.Empty
 			
-			&& !FindObjectOfType<Board>().CellIsInDanger(row, 1, !isWhite)
-			&& !FindObjectOfType<Board>().CellIsInDanger(row, 2, !isWhite)
-			&& !FindObjectOfType<Board>().CellIsInDanger(row, 3, !isWhite))
+			&& !Board.CellIsInDanger(row, 1, !isWhite)
+			&& !Board.CellIsInDanger(row, 2, !isWhite)
+			&& !Board.CellIsInDanger(row, 3, !isWhite))
 		{
 			validMoves.Add(new Move(row, 1, isKill: false, isCastle: true));
 		}
@@ -98,12 +98,12 @@ public class King : Chessman
 
 	public bool IsUnderThreat()
 	{
-		return ToBeKilled(FindObjectOfType<Board>().Cells, Enemies);
+		return ToBeKilled(Board.Cells, Enemies);
 	}
 
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)
 	{
-		Cell[,] boardAfterMove = (Cell[,])FindObjectOfType<Board>().Cells.Clone();
+		Cell[,] boardAfterMove = (Cell[,])Board.Cells.Clone();
 		List<Chessman> enemies = new List<Chessman>(Enemies);
 
 		if ((boardAfterMove[endY, endX] & Enemy) == Enemy)

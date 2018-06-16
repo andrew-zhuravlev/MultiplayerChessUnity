@@ -9,8 +9,8 @@ public class CellsTest {
 	[Test]
 	public void Cells_Set_To_King_On_00()
 	{
-		//FindObjectOfType<Board>().Cells[0, 0] = Cell.King;
+		//Board.Cells[0, 0] = Cell.King;
 
-		//Assert.IsTrue(FindObjectOfType<Board>().Cells[0, 0] == Cell.King);
+		//Assert.IsTrue(Board.Cells[0, 0] == Cell.King);
 	}
 }
