@@ -3,7 +3,7 @@
 //TODO: Взятие на проходе
 public class Pawn : Chessman
 {
-	protected override Move[] GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
+	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
 	{
 		List<Move> validMoves = new List<Move>();
 
@@ -26,7 +26,7 @@ public class Pawn : Chessman
 		if (initialCell && board[isWhite ? Y + 1 : Y - 1, X] == Cell.Empty)
 			CheckMove(isWhite ? Y + 2 : Y - 2, X, validMoves, checkFriendlyKingSafety, board);
 
-		return validMoves.ToArray();
+		return validMoves;
 	}
 
 	void CheckMove(int endY, int endX, List<Move> validMoves, bool checkFriendlyKingSafety, Cell[,] board)
@@ -41,7 +41,7 @@ public class Pawn : Chessman
 
 		bool isValidMove = validKillMove || validForwardMove;
 		if (checkFriendlyKingSafety)
-			isValidMove = isValidMove && !(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
+			isValidMove = isValidMove && !(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
 
 		if (!isValidMove)
 			return;

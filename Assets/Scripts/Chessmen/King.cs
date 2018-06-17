@@ -7,28 +7,28 @@ public class King : Chessman
 
 	List<Chessman> Enemies
 	{
-		get { return isWhite ? Board.Instance.BlackChessmen : Board.Instance.WhiteChessmen; }
+		get { return isWhite ? board.BlackChessmen : board.WhiteChessmen; }
 	}
 
 	public override void OnMove(int z, int x)
 	{
-		if (Y - Board.Instance.GetBoardPos(z) == 0)
+		if (Y - board.GetBoardPos(z) == 0)
 		{
-			int xDelta = Board.Instance.GetBoardPos(x) - X;
+			int xDelta = board.GetBoardPos(x) - X;
 			int row = isWhite ? 0 : 7;
 
 			//TODO: Fix this.
 			//if (xDelta == -3)
-			//	Board.Instance.MakeMove(Board.Instance.GetChessmanByBoardIndex(row, 0), Board.Instance.GetActualPos(row), Board.Instance.GetActualPos(2));
+			//	board.MakeMove(board.GetChessmanByBoardIndex(row, 0), board.GetActualPos(row), board.GetActualPos(2));
 
 			//else if (xDelta == 2)
-			//	Board.Instance.MakeMove(Board.Instance.GetChessmanByBoardIndex(row, 7), Board.Instance.GetActualPos(row), Board.Instance.GetActualPos(5));
+			//	board.MakeMove(board.GetChessmanByBoardIndex(row, 7), board.GetActualPos(row), board.GetActualPos(5));
 		}
 
 		hasMoved = true;
 	}
 
-	protected override Move[] GetValidMoves(bool checkSafety, Cell[,] board)
+	protected override List<Move> GetValidMoves(bool checkSafety, Cell[,] board)
 	{
 		List<Move> validMoves = new List<Move>();
 
@@ -44,7 +44,7 @@ public class King : Chessman
 		if (checkSafety)
 			CheckCastle(validMoves);
 
-		return validMoves.ToArray();
+		return validMoves;
 	}
 
 	void CheckMove(int endY, int endX, List<Move> validMoves, bool checkSafety, Cell[,] board)
@@ -67,30 +67,30 @@ public class King : Chessman
 			return;
 
 		int row = isWhite ? 0 : 7;
-		Rook rook = Board.Instance.GetChessmanByBoardIndex(row, 7) as Rook;
+		Rook rook = board.GetChessmanByBoardIndex(row, 7) as Rook;
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& Board.Instance.Cells[row, 5] == Cell.Empty
-			&& Board.Instance.Cells[row, 6] == Cell.Empty
+			&& board.Cells[row, 5] == Cell.Empty
+			&& board.Cells[row, 6] == Cell.Empty
 			
-			&& !Board.Instance.CellIsInDanger(row, 5, !isWhite)
-			&& !Board.Instance.CellIsInDanger(row, 6, !isWhite))
+			&& !board.CellIsInDanger(row, 5, !isWhite)
+			&& !board.CellIsInDanger(row, 6, !isWhite))
 		{
 			validMoves.Add(new Move(row, 6, isKill: false, isCastle: true));
 		}
 
-		rook = Board.Instance.GetChessmanByBoardIndex(row, 0) as Rook;
+		rook = board.GetChessmanByBoardIndex(row, 0) as Rook;
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& Board.Instance.Cells[row, 1] == Cell.Empty
-			&& Board.Instance.Cells[row, 2] == Cell.Empty
-			&& Board.Instance.Cells[row, 3] == Cell.Empty
+			&& board.Cells[row, 1] == Cell.Empty
+			&& board.Cells[row, 2] == Cell.Empty
+			&& board.Cells[row, 3] == Cell.Empty
 			
-			&& !Board.Instance.CellIsInDanger(row, 1, !isWhite)
-			&& !Board.Instance.CellIsInDanger(row, 2, !isWhite)
-			&& !Board.Instance.CellIsInDanger(row, 3, !isWhite))
+			&& !board.CellIsInDanger(row, 1, !isWhite)
+			&& !board.CellIsInDanger(row, 2, !isWhite)
+			&& !board.CellIsInDanger(row, 3, !isWhite))
 		{
 			validMoves.Add(new Move(row, 1, isKill: false, isCastle: true));
 		}
@@ -98,16 +98,16 @@ public class King : Chessman
 
 	public bool IsUnderThreat()
 	{
-		return ToBeKilled(Board.Instance.Cells, Enemies);
+		return ToBeKilled(board.Cells, Enemies);
 	}
 
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)
 	{
-		Cell[,] boardAfterMove = (Cell[,])Board.Instance.Cells.Clone();
+		Cell[,] boardAfterMove = (Cell[,])board.Cells.Clone();
 		List<Chessman> enemies = new List<Chessman>(Enemies);
 
 		if ((boardAfterMove[endY, endX] & Enemy) == Enemy)
-			enemies.Remove(Board.Instance.GetChessmanByBoardIndex(endY, endX));
+			enemies.Remove(board.GetChessmanByBoardIndex(endY, endX));
 
 		boardAfterMove[startY, startX] = Cell.Empty;
 		boardAfterMove[endY, endX] = isWhite ? Cell.WhiteFigure : Cell.BlackFigure;

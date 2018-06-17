@@ -2,7 +2,7 @@
 
 public static class RookMovementProvider
 {
-	public static Move[] GetValidMoves(int startY, int startX, bool isWhite, King friendlyKing, Cell[,] board)
+	public static List<Move> GetValidMoves(int startY, int startX, bool isWhite, King friendlyKing, Cell[,] board)
 	{
 		List<Move> validMoves = new List<Move>();
 
@@ -22,6 +22,6 @@ public static class RookMovementProvider
 		for (int x = startX - 1; x >= 0 && moveFurther; x--)
 			MoveChecker.CheckMove(startY, startX, startY, x, isWhite, board[startY, x], validMoves, friendlyKing, ref moveFurther);
 
-		return validMoves.ToArray();
+		return validMoves;
 	}
 }

@@ -1,18 +1,16 @@
-﻿public class Queen : Chessman
+﻿using System.Collections.Generic;
+using System.Linq;
+
+public class Queen : Chessman
 {
-	protected override Move[] GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
+	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
 	{
-		Move[] rookMoves = RookMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ?
-			(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing) : null, board);
+		List<Move> rookMoves = RookMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ?
+			(isWhite ? this.board.WhiteKing : this.board.BlackKing) : null, board);
 
-		Move[] bishopMoves = BishopMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ?
-			(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing) : null, board);
+		List<Move> bishopMoves = BishopMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ?
+			(isWhite ? this.board.WhiteKing : this.board.BlackKing) : null, board);
 
-		Move[] validMoves = new Move[rookMoves.Length + bishopMoves.Length];
-
-		rookMoves.CopyTo(validMoves, 0);
-		bishopMoves.CopyTo(validMoves, rookMoves.Length);
-
-		return validMoves;
+		return rookMoves.Concat(bishopMoves).ToList();
 	}
 }

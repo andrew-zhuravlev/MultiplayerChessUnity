@@ -6,17 +6,25 @@ public class Player : NetworkBehaviour
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessman_NetworkIdentity;
 
+	Board board;
+
 	void Start()
 	{
-		if (!isLocalPlayer)
-			return;
+		board = Board.Instance;
 
-		Board.Instance.Init();
+		//Doesn't matter for this particular game but will make board initialize if there is third player who connects.
+		if (isLocalPlayer)
+		{
+			board.Init();
+
+			if(!isServer)
+				FindObjectOfType<PlayerCamera>().PointToBlack();
+		}
 	}
 
 	void Update()
 	{
-		if (!isLocalPlayer || isServer != Board.Instance.WhiteMoves)
+		if (!isLocalPlayer || isServer != board.WhiteMoves)
 			return;
 
 		CheckSelection();
@@ -39,16 +47,16 @@ public class Player : NetworkBehaviour
 			else if (selectedChessman == chessmanComponent)
 			{
 				selectedChessman = null;
-				Board.Instance.RemoveHighlighters();
+				board.RemoveHighlighters();
 			}
 
 			else if (isServer == chessmanComponent.isWhite)
 			{
-				Board.Instance.RemoveHighlighters();
+				board.RemoveHighlighters();
 				selectedChessman = chessmanComponent;
 				selectedChessman_NetworkIdentity = hit.collider.GetComponent<NetworkIdentity>();
 
-				Board.Instance.DisplayHighlighters(chessmanComponent.GetValidMoves());
+				board.DisplayHighlighters(chessmanComponent.GetValidMoves());
 			}
 		}
 	}
@@ -63,29 +71,28 @@ public class Player : NetworkBehaviour
 			MakeMove(selectedChessman_NetworkIdentity, (int)hit.transform.position.z, (int)hit.transform.position.x);
 	}
 
-	public void MakeMove(NetworkIdentity identity, int z, int x)
+	void MakeMove(NetworkIdentity identity, int z, int x)
 	{
 		CmdMoveFigure(identity, selectedChessman.Y, selectedChessman.X, z, x, selectedChessman.isWhite, (selectedChessman as King) != null);
-		Board.Instance.RemoveHighlighters();
+		board.RemoveHighlighters();
 	}
 
 	[Command]
-	public void CmdMoveFigure(NetworkIdentity identity, int fromZ, int fromX, int z, int x, bool isWhite, bool isKing)
+	void CmdMoveFigure(NetworkIdentity identity, int fromZ, int fromX, int z, int x, bool isWhite, bool isKing)
 	{
+		board.WhiteMoves = !board.WhiteMoves;
 		RpcMoveFigure(identity, fromZ, fromX, z, x, isWhite, isKing);
 	}
 
 	[ClientRpc]
-	public void RpcMoveFigure(NetworkIdentity identity, int fromZ, int fromX, int z, int x, bool isWhite, bool isKing)
+	void RpcMoveFigure(NetworkIdentity identity, int fromZ, int fromX, int z, int x, bool isWhite, bool isKing)
 	{
-		Debug.Log("RpcMoveFigure()");
-
-		Board.Instance.SetCell(fromZ, fromX, Board.Instance.GetBoardPos(z), Board.Instance.GetBoardPos(x), isWhite, isKing);
-		Board.Instance.WhiteMoves = !Board.Instance.WhiteMoves;
+		board.SetCell(fromZ, fromX, board.GetBoardPos(z), board.GetBoardPos(x), isWhite, isKing);
 
 		identity.transform.position = new Vector3(x, 0, z);
 		identity.GetComponent<Chessman>().OnMove(z, x);
 
+		//Executes on every client. One extra (redundant) step. So that one of them is already null.
 		selectedChessman = null;
 		selectedChessman_NetworkIdentity = null;
 	}

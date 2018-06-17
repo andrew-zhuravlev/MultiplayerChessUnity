@@ -1,8 +1,10 @@
-﻿public class Bishop : Chessman
+﻿using System.Collections.Generic;
+
+public class Bishop : Chessman
 {
-	protected override Move[] GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
+	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
 	{
 		return BishopMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ?
-			(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing) : null, board);
+			(isWhite ? this.board.WhiteKing : this.board.BlackKing) : null, board);
 	}
 }

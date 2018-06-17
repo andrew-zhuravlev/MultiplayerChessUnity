@@ -7,9 +7,13 @@ public class Board : NetworkBehaviour
 {
 	#region Singleton
 	public static Board Instance { get; private set; }
-	void Start()
+	void Awake()
 	{
 		Instance = this;
+	}
+	void OnDestroy()
+	{
+		Instance = null;
 	}
 	#endregion
 
@@ -22,7 +26,7 @@ public class Board : NetworkBehaviour
 
 	public Cell[,] Cells { get; private set; }
 
-	//TODO: Make client handler object.
+	[SyncVar]
 	public bool WhiteMoves = true;
 
 	const int CELL_SIZE = 9;
@@ -111,7 +115,7 @@ public class Board : NetworkBehaviour
 			Cells[endY, endX] |= Cell.King;
 	}
 
-	public void DisplayHighlighters(Move[] possibleMoves)
+	public void DisplayHighlighters(List<Move> possibleMoves)
 	{
 		if (possibleMoves.Count() == 0)
 		{

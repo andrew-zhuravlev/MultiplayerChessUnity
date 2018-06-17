@@ -1,12 +1,20 @@
 ﻿using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 public abstract class Chessman : MonoBehaviour
 {
+	protected Board board;
+
+	public void Start()
+	{
+		board = Board.Instance;
+	}
+
 	public bool isWhite;
 
-	public int Y { get { return Board.Instance.GetBoardPos((int)transform.position.z); } }
-	public int X { get { return Board.Instance.GetBoardPos((int)transform.position.x); } }
+	public int Y { get { return board.GetBoardPos((int)transform.position.z); } }
+	public int X { get { return board.GetBoardPos((int)transform.position.x); } }
 	
 	public bool ThreatForEnemyKing(Cell[,] newBoard)
 	{
@@ -16,7 +24,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public bool CanKillCell(int y, int x)
 	{
-		return GetValidMoves(checkFriendlyKingSafety: false, board: Board.Instance.Cells)
+		return GetValidMoves(checkFriendlyKingSafety: false, board: board.Cells)
 			.Any(move => move.y == y && move.x == x);
 	}
 
@@ -30,11 +38,11 @@ public abstract class Chessman : MonoBehaviour
 		get { return isWhite ? Cell.WhiteFigure : Cell.BlackFigure; }
 	}
 
-	protected abstract Move[] GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board);
+	protected abstract List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board);
 
-	public Move[] GetValidMoves()
+	public List<Move> GetValidMoves()
 	{
-		return GetValidMoves(checkFriendlyKingSafety: true, board: Board.Instance.Cells);
+		return GetValidMoves(checkFriendlyKingSafety: true, board: board.Cells);
 	}
 
 	public virtual void OnMove(int z, int x) { }
