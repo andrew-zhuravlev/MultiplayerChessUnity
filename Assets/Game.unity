@@ -1099,6 +1099,18 @@ MonoBehaviour:
       type: 2}
     amountToPool: 8
     shouldExpand: 0
+  - objectToPool: {fileID: 1875759773851522, guid: 233bb1b76d02a5b46bdf6742d6c3acc9,
+      type: 2}
+    amountToPool: 8
+    shouldExpand: 0
+  - objectToPool: {fileID: 1189455942717334, guid: 90dbf5bd517d6ba409c68f469c963dd8,
+      type: 2}
+    amountToPool: 8
+    shouldExpand: 0
+  - objectToPool: {fileID: 1189455942717334, guid: 7495acd7831a51d49b42c0b3b075adaf,
+      type: 2}
+    amountToPool: 8
+    shouldExpand: 0
   pooledObjects: []
 --- !u!4 &1002807594
 Transform:
@@ -1826,106 +1838,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4091346932552376, guid: f9404097603eab24d90c1788cbb44a02,
     type: 2}
   m_PrefabInternal: {fileID: 1728852855}
---- !u!1 &1742786665
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1742786670}
-  - component: {fileID: 1742786669}
-  - component: {fileID: 1742786668}
-  - component: {fileID: 1742786667}
-  - component: {fileID: 1742786666}
-  m_Layer: 0
-  m_Name: Main Camera (1)
-  m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1742786666
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1742786665}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b2a7c1c1a420a443911a0de22ccecdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  center: {x: 31.5, y: 0, z: 31.5}
-  blackCameraPos: {x: 31.5, y: 67.1, z: 68.2}
-  zoomSpeed: 1250
-  rotationSpeed: 70
-  mouseButton: 1
-  maxInZoom: 1.3
-  maxOutZoom: -1.5
---- !u!81 &1742786667
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1742786665}
-  m_Enabled: 1
---- !u!124 &1742786668
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1742786665}
-  m_Enabled: 1
---- !u!20 &1742786669
-Camera:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1742786665}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: -1
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!4 &1742786670
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1742786665}
-  m_LocalRotation: {x: 0, y: 0.8898229, z: -0.45630604, w: 0}
-  m_LocalPosition: {x: 31.5, y: 53.3, z: 79.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 54.298004, y: 180, z: 0}
 --- !u!1001 &1846725452
 Prefab:
   m_ObjectHideFlags: 0
@@ -2216,7 +2128,8 @@ MonoBehaviour:
   center: {x: 31.5, y: 0, z: 31.5}
   blackCameraPos: {x: 31.5, y: 53.3, z: 79.5}
   zoomSpeed: 1250
-  rotationSpeed: 70
+  rotationSpeedX: 80
+  rotationSpeedY: 60
   mouseButton: 1
   maxInZoom: 1.3
   maxOutZoom: -1.5

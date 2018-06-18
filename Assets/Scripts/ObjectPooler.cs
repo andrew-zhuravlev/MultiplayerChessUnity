@@ -19,17 +19,17 @@ public class ObjectPoolItem
 
 public class ObjectPooler : MonoBehaviour
 {
-	public static ObjectPooler SharedInstance;
+	public static ObjectPooler Instance;
 	public List<ObjectPoolItem> itemsToPool;
 
 
 	public List<List<GameObject>> pooledObjectsList;
 	public List<GameObject> pooledObjects;
-	private List<int> positions;
+	List<int> positions;
 
 	void Awake()
 	{
-		SharedInstance = this;
+		Instance = this;
 
 		pooledObjectsList = new List<List<GameObject>>();
 		pooledObjects = new List<GameObject>();

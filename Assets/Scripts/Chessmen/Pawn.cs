@@ -10,21 +10,21 @@ public class Pawn : Chessman
 		int endY, endX;
 
 		if (isWhite)
-			endY = Y + 1;
+			endY = Y_Board + 1;
 
 		else
-			endY = Y - 1;
+			endY = Y_Board - 1;
 
 		for (int i = -1; i <= 1; i++)
 		{
-			endX = X + i;
+			endX = X_Board + i;
 
 			CheckMove(endY, endX, validMoves, checkFriendlyKingSafety, board);
 		}
 
-		bool initialCell = isWhite ? Y == 1 : Y == 6;
-		if (initialCell && board[isWhite ? Y + 1 : Y - 1, X] == Cell.Empty)
-			CheckMove(isWhite ? Y + 2 : Y - 2, X, validMoves, checkFriendlyKingSafety, board);
+		bool initialCell = isWhite ? Y_Board == 1 : Y_Board == 6;
+		if (initialCell && board[isWhite ? Y_Board + 1 : Y_Board - 1, X_Board] == Cell.Empty)
+			CheckMove(isWhite ? Y_Board + 2 : Y_Board - 2, X_Board, validMoves, checkFriendlyKingSafety, board);
 
 		return validMoves;
 	}
@@ -34,24 +34,22 @@ public class Pawn : Chessman
 		if (endX < 0 || endX > 7)
 			return;
 
-		int xDelta = endX - X;
+		int xDelta = endX - X_Board;
 		Cell curCell = board[endY, endX];
 		bool validKillMove = xDelta != 0 && (curCell & Enemy) == Enemy;
 		bool validForwardMove = xDelta == 0 && curCell == Cell.Empty;
 
 		bool isValidMove = validKillMove || validForwardMove;
 		if (checkFriendlyKingSafety)
-			isValidMove = isValidMove && !(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null);
+			isValidMove = isValidMove && !(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y_Board, X_Board, endY, endX, null);
 
-		if (!isValidMove)
-			return;
-
-		validMoves.Add(new Move(endY, endX, isKill: validKillMove, isCastle: false));
+		if (isValidMove)
+			validMoves.Add(new Move(endY, endX, isKill: validKillMove, isCastle: false));
 	}
 
 	public override void OnMove(int z, int x)
 	{
-		if (isWhite ? Y == 7 : Y == 0)
+		if (isWhite ? Y_Board == 7 : Y_Board == 0)
 			TurnIntoQueen();
 	}
 

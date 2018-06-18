@@ -8,7 +8,8 @@ public class PlayerCamera : MonoBehaviour
 	[SerializeField] Vector3 blackCameraPos;
 
 	[SerializeField] float zoomSpeed;
-	[SerializeField] float rotationSpeed;
+	[SerializeField] float rotationSpeedX;
+	[SerializeField] float rotationSpeedY;
 
 	[Header("Zoom")]
 	[SerializeField] int mouseButton = 3;
@@ -18,10 +19,19 @@ public class PlayerCamera : MonoBehaviour
 	float curZoom = 0;
 	Vector3 prevMousePos;
 
-	public void PointToBlack()
+	Vector3 initialPos;
+	Vector3 initialRot;
+
+	void Start()
 	{
-		transform.position = blackCameraPos;
-		transform.Rotate(Vector3.up * 180, Space.World);
+		initialPos = this.transform.position;
+		initialRot = this.transform.rotation.eulerAngles;
+	}
+
+	public void SetDefaultPos(bool pointToWhite)
+	{
+		transform.position = pointToWhite ? initialPos : blackCameraPos;
+		transform.rotation = Quaternion.Euler(initialRot + (pointToWhite ? Vector3.zero : Vector3.up * 180));
 	}
 
 	void Update()
@@ -47,8 +57,8 @@ public class PlayerCamera : MonoBehaviour
 		if (Input.GetMouseButton(mouseButton))
 		{
 			Vector3 delta = (curMousePos - prevMousePos).normalized;
-			transform.RotateAround(center, Vector3.up, delta.x * Time.deltaTime * rotationSpeed);
-			transform.RotateAround(center, transform.right, -delta.y * Time.deltaTime * rotationSpeed);
+			transform.RotateAround(center, Vector3.up, delta.x * Time.deltaTime * rotationSpeedX);
+			transform.RotateAround(center, transform.right, -delta.y * Time.deltaTime * rotationSpeedY);
 		}
 		prevMousePos = curMousePos;
 	}

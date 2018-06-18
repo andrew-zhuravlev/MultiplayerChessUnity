@@ -24,23 +24,41 @@ public class Board : NetworkBehaviour
 	public List<Chessman> BlackChessmen { get; private set; }
 	public Dictionary<int, Transform> AllChessmen { get; private set; }
 
-	public Cell[,] Cells { get; private set; }
+	Cell[,] cells;
+	public Cell[,] GetCells()
+	{
+		return cells;
+	}
 
 	[SyncVar]
-	public bool WhiteMoves = true;
+	bool _whiteMoves = true;
+
+	public bool WhiteMoves
+	{
+		get
+		{
+			return _whiteMoves;
+		}
+	}
+
+	[Server]
+	public void SwapPlayer()
+	{
+		_whiteMoves = !_whiteMoves;
+	}
 
 	const int CELL_SIZE = 9;
 	#endregion
 
 	#region Helper Methods
-	public int GetActualPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
+	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
 
 	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
 
 	public Chessman GetChessmanByBoardIndex(int y, int x)
 	{
 		RaycastHit hit;
-		Ray ray = new Ray(new Vector3(GetActualPos(x), 30f, GetActualPos(y)), Vector3.down);
+		Ray ray = new Ray(new Vector3(GetWorldPos(x), 30f, GetWorldPos(y)), Vector3.down);
 
 		if (Physics.Raycast(ray, out hit, 30f, LayerMask.GetMask("Chessmen")))
 			return hit.collider.GetComponent<Chessman>();
@@ -51,7 +69,7 @@ public class Board : NetworkBehaviour
 
 	public bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
 	{
-		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
+		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x)) 
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
 	}
 	#endregion
@@ -95,24 +113,24 @@ public class Board : NetworkBehaviour
 
 	void Init_Cells()
 	{
-		Cells = new Cell[8, 8];
+		cells = new Cell[8, 8];
 
 		for (int i = 0; i < 4; i++)
 			for (int j = 0; j < 8; j++)
-				Cells[i < 2 ? i : i + 4, j] = i < 2 ? Cell.WhiteFigure : Cell.BlackFigure;
+				GetCells()[i < 2 ? i : i + 4, j] = i < 2 ? Cell.WhiteFigure : Cell.BlackFigure;
 
-		Cells[0, 4] |= Cell.King;
-		Cells[7, 4] |= Cell.King;
+		GetCells()[0, 4] |= Cell.King;
+		GetCells()[7, 4] |= Cell.King;
 	}
 	#endregion
 
-	public void SetCell(int startY, int startX, int endY, int endX, bool isWhite, bool isKing)
+	public void SetCell(int fromZ, int fromX, int toZ, int toX, bool isWhite, bool isKing)
 	{
-		Cells[startY, startX] = Cell.Empty;
-		Cells[endY, endX] = (isWhite ? Cell.WhiteFigure : Cell.BlackFigure);
+		GetCells()[fromZ, fromX] = Cell.Empty;
+		GetCells()[toZ, toX] = (isWhite ? Cell.WhiteFigure : Cell.BlackFigure);
 
 		if (isKing)
-			Cells[endY, endX] |= Cell.King;
+			GetCells()[toZ, toX] |= Cell.King;
 	}
 
 	public void DisplayHighlighters(List<Move> possibleMoves)
@@ -129,12 +147,14 @@ public class Board : NetworkBehaviour
 			float height_Y = 1;
 
 			if (p.isCastle)
-				objectIndex = 4;
+				objectIndex = 2;
 
 			else if (p.isKill)
 			{
-				Chessman chessman = GetChessmanByBoardIndex(p.y, p.x);
+				Chessman chessman = GetChessmanByBoardIndex(p.z, p.x);
 
+				//Getting the height of Red Cube above the figure to kill.
+				//My figures will be replaced anyway, this should be fixed.
 				switch (chessman.tag)
 				{
 					case "Pawn": height_Y = 11; break;
@@ -157,14 +177,14 @@ public class Board : NetworkBehaviour
 				objectIndex = 0;
 
 			//Sets the highlighter at correct place
-			GameObject highlighter = ObjectPooler.SharedInstance.GetPooledObject(objectIndex);
-			Vector3 newPos = new Vector3(GetActualPos(p.x), height_Y, GetActualPos(p.y));
+			GameObject highlighter = ObjectPooler.Instance.GetPooledObject(objectIndex);
+			Vector3 newPos = new Vector3(GetWorldPos(p.x), height_Y, GetWorldPos(p.z));
 			highlighter.transform.position = newPos;
 			highlighter.SetActive(true);
 		}
 	}
 
-	//TODO: How does it remove kill highlighters??
+	//TODO: Optimize.
 	public void RemoveHighlighters()
 	{
 		foreach (var moveHighlighter in GameObject.FindGameObjectsWithTag("Move Highlighter"))

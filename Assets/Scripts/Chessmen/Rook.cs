@@ -7,7 +7,7 @@ public class Rook : Chessman
 
 	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
 	{
-		return RookMovementProvider.GetValidMoves(Y, X, isWhite, checkFriendlyKingSafety ? 
+		return RookMovementProvider.GetValidMoves(Y_Board, X_Board, isWhite, checkFriendlyKingSafety ? 
 			(isWhite ? this.board.WhiteKing : this.board.BlackKing) : null, board);
 	}
 

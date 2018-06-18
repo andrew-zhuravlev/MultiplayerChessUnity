@@ -13,19 +13,25 @@ public abstract class Chessman : MonoBehaviour
 
 	public bool isWhite;
 
-	public int Y { get { return board.GetBoardPos((int)transform.position.z); } }
-	public int X { get { return board.GetBoardPos((int)transform.position.x); } }
+	/// <summary>
+	/// Gets the Y coordinate relative to board.
+	/// </summary>
+	public int Y_Board { get { return board.GetBoardPos((int)transform.position.z); } }
+	/// <summary>
+	/// Gets the X coordinate relative to board.
+	/// </summary>
+	public int X_Board { get { return board.GetBoardPos((int)transform.position.x); } }
 	
 	public bool ThreatForEnemyKing(Cell[,] newBoard)
 	{
 		return GetValidMoves(checkFriendlyKingSafety: false, board: newBoard)
-			.Any(move => move.isKill && (newBoard[move.y, move.x] & Cell.King) == Cell.King);
+			.Any(move => move.isKill && (newBoard[move.z, move.x] & Cell.King) == Cell.King);
 	}
 
 	public bool CanKillCell(int y, int x)
 	{
-		return GetValidMoves(checkFriendlyKingSafety: false, board: board.Cells)
-			.Any(move => move.y == y && move.x == x);
+		return GetValidMoves(checkFriendlyKingSafety: false, board: board.GetCells())
+			.Any(move => move.z == y && move.x == x);
 	}
 
 	protected Cell Enemy
@@ -42,7 +48,7 @@ public abstract class Chessman : MonoBehaviour
 
 	public List<Move> GetValidMoves()
 	{
-		return GetValidMoves(checkFriendlyKingSafety: true, board: board.Cells);
+		return GetValidMoves(checkFriendlyKingSafety: true, board: board.GetCells());
 	}
 
 	public virtual void OnMove(int z, int x) { }

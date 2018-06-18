@@ -7,17 +7,17 @@ public class Knight : Chessman
 	{
 		List<Move> result = new List<Move>();
 
-		CheckMove(Y + 2, X - 1, result, checkFriendlyKingSafety, board);
-		CheckMove(Y + 2, X + 1, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board + 2, X_Board - 1, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board + 2, X_Board + 1, result, checkFriendlyKingSafety, board);
 
-		CheckMove(Y - 2, X - 1, result, checkFriendlyKingSafety, board);
-		CheckMove(Y - 2, X + 1, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board - 2, X_Board - 1, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board - 2, X_Board + 1, result, checkFriendlyKingSafety, board);
 
-		CheckMove(Y + 1, X + 2, result, checkFriendlyKingSafety, board);
-		CheckMove(Y - 1, X + 2, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board + 1, X_Board + 2, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board - 1, X_Board + 2, result, checkFriendlyKingSafety, board);
 
-		CheckMove(Y + 1, X - 2, result, checkFriendlyKingSafety, board);
-		CheckMove(Y - 1, X - 2, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board + 1, X_Board - 2, result, checkFriendlyKingSafety, board);
+		CheckMove(Y_Board - 1, X_Board - 2, result, checkFriendlyKingSafety, board);
 
 		return result;
 	}
@@ -25,7 +25,7 @@ public class Knight : Chessman
 	void CheckMove(int endY, int endX, List<Move> result, bool checkFriendlyKingSafety, Cell[,] board)
 	{
 		if (endY < 0 || endY > 7 || endX < 0 || endX > 7 || (board[endY, endX] & Friend) == Friend || !(checkFriendlyKingSafety ?
-			!(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y, X, endY, endX, null) : true))
+			!(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y_Board, X_Board, endY, endX, null) : true))
 			return;
 
 		if (board[endY, endX] == Cell.Empty)

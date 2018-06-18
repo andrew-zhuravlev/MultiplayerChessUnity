@@ -12,19 +12,6 @@ public class King : Chessman
 
 	public override void OnMove(int z, int x)
 	{
-		if (Y - board.GetBoardPos(z) == 0)
-		{
-			int xDelta = board.GetBoardPos(x) - X;
-			int row = isWhite ? 0 : 7;
-
-			//TODO: Fix this.
-			//if (xDelta == -3)
-			//	board.MakeMove(board.GetChessmanByBoardIndex(row, 0), board.GetActualPos(row), board.GetActualPos(2));
-
-			//else if (xDelta == 2)
-			//	board.MakeMove(board.GetChessmanByBoardIndex(row, 7), board.GetActualPos(row), board.GetActualPos(5));
-		}
-
 		hasMoved = true;
 	}
 
@@ -34,12 +21,12 @@ public class King : Chessman
 
 		for (int i = -1; i <= 1; i++)
 		{
-			CheckMove(Y + 1, X + i, validMoves, checkSafety, board);
-			CheckMove(Y - 1, X + i, validMoves, checkSafety, board);
+			CheckMove(Y_Board + 1, X_Board + i, validMoves, checkSafety, board);
+			CheckMove(Y_Board - 1, X_Board + i, validMoves, checkSafety, board);
 		}
 
-		CheckMove(Y, X - 1, validMoves, checkSafety, board);
-		CheckMove(Y, X + 1, validMoves, checkSafety, board);
+		CheckMove(Y_Board, X_Board - 1, validMoves, checkSafety, board);
+		CheckMove(Y_Board, X_Board + 1, validMoves, checkSafety, board);
 
 		if (checkSafety)
 			CheckCastle(validMoves);
@@ -51,7 +38,7 @@ public class King : Chessman
 	{
 		bool isOutOfBounds = endY < 0 || endY > 7 || endX < 0 || endX > 7;
 
-		if (isOutOfBounds || board[endY, endX] == Friend || (checkSafety && WillBeKilledAfterMove(Y, X, endY, endX, this)))
+		if (isOutOfBounds || board[endY, endX] == Friend || (checkSafety && WillBeKilledAfterMove(Y_Board, X_Board, endY, endX, this)))
 			return;
 
 		if (board[endY, endX] == Cell.Empty)
@@ -71,8 +58,8 @@ public class King : Chessman
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& board.Cells[row, 5] == Cell.Empty
-			&& board.Cells[row, 6] == Cell.Empty
+			&& board.GetCells()[row, 5] == Cell.Empty
+			&& board.GetCells()[row, 6] == Cell.Empty
 			
 			&& !board.CellIsInDanger(row, 5, !isWhite)
 			&& !board.CellIsInDanger(row, 6, !isWhite))
@@ -84,9 +71,9 @@ public class King : Chessman
 
 		if (rook != null 
 			&& (isWhite ? rook.isWhite : !rook.isWhite) 
-			&& board.Cells[row, 1] == Cell.Empty
-			&& board.Cells[row, 2] == Cell.Empty
-			&& board.Cells[row, 3] == Cell.Empty
+			&& board.GetCells()[row, 1] == Cell.Empty
+			&& board.GetCells()[row, 2] == Cell.Empty
+			&& board.GetCells()[row, 3] == Cell.Empty
 			
 			&& !board.CellIsInDanger(row, 1, !isWhite)
 			&& !board.CellIsInDanger(row, 2, !isWhite)
@@ -98,12 +85,12 @@ public class King : Chessman
 
 	public bool IsUnderThreat()
 	{
-		return ToBeKilled(board.Cells, Enemies);
+		return ToBeKilled(board.GetCells(), Enemies);
 	}
 
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)
 	{
-		Cell[,] boardAfterMove = (Cell[,])board.Cells.Clone();
+		Cell[,] boardAfterMove = (Cell[,])board.GetCells().Clone();
 		List<Chessman> enemies = new List<Chessman>(Enemies);
 
 		if ((boardAfterMove[endY, endX] & Enemy) == Enemy)
