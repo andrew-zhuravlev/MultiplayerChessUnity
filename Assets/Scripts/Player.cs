@@ -98,12 +98,9 @@ public class Player : NetworkBehaviour
 
 		if (!identityChessman.GetValidMoves().Any(move => move.x == boardToX && move.z == boardToZ))
 		{
-			Debug.LogError("This move was not legit.");
+			Debug.LogError("NOT LEGIT MOVE");
 			return;
 		}
-
-		Debug.Log("Move correct.");
-
 
 		King kingComponent = identityChessman as King;
 		bool isKing = kingComponent != null;

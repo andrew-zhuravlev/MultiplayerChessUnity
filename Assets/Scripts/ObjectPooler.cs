@@ -12,7 +12,7 @@ public class ObjectPoolItem
 	public ObjectPoolItem(GameObject objToPool, int amt, bool exp = true)
 	{
 		objectToPool = objToPool;
-		amountToPool = Mathf.Max(amt,2);
+		amountToPool = Mathf.Max(amt, 2);
 		shouldExpand = exp;
 	}
 }
@@ -20,8 +20,8 @@ public class ObjectPoolItem
 public class ObjectPooler : MonoBehaviour
 {
 	public static ObjectPooler Instance;
-	public List<ObjectPoolItem> itemsToPool;
 
+	public List<ObjectPoolItem> itemsToPool;
 
 	public List<List<GameObject>> pooledObjectsList;
 	public List<GameObject> pooledObjects;
@@ -41,11 +41,16 @@ public class ObjectPooler : MonoBehaviour
 		}
 	}
 
+	void OnDestroy()
+	{
+		Instance = null;
+	}
+
 
 	public GameObject GetPooledObject(int index)
 	{
 		int curSize = pooledObjectsList[index].Count;
-		for (int i = positions[index] + 1; i < positions[index] + pooledObjectsList[index].Count; i++)
+		for (int i = positions[index] + 1; i < positions[index] + curSize; i++)
 		{
 			if (!pooledObjectsList[index][i % curSize].activeInHierarchy)
 			{

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 public class Queen : Chessman
 {
@@ -11,6 +10,8 @@ public class Queen : Chessman
 		List<Move> bishopMoves = BishopMovementProvider.GetValidMoves(Y_Board, X_Board, isWhite, checkFriendlyKingSafety ?
 			(isWhite ? this.board.WhiteKing : this.board.BlackKing) : null, board);
 
-		return rookMoves.Concat(bishopMoves).ToList();
+		rookMoves.AddRange(bishopMoves);
+
+		return rookMoves;
 	}
 }

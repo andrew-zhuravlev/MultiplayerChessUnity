@@ -13,13 +13,8 @@ public abstract class Chessman : MonoBehaviour
 
 	public bool isWhite;
 
-	/// <summary>
-	/// Gets the Y coordinate relative to board.
-	/// </summary>
 	public int Y_Board { get { return board.GetBoardPos((int)transform.position.z); } }
-	/// <summary>
-	/// Gets the X coordinate relative to board.
-	/// </summary>
+
 	public int X_Board { get { return board.GetBoardPos((int)transform.position.x); } }
 	
 	public bool ThreatForEnemyKing(Cell[,] newBoard)

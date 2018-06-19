@@ -31,6 +31,7 @@ public class Knight : Chessman
 		if (board[endY, endX] == Cell.Empty)
 			result.Add(new Move(endY, endX, isKill: false, isCastle: false));
 
-		else result.Add(new Move(endY, endX, isKill: true, isCastle: false));
+		else
+			result.Add(new Move(endY, endX, isKill: true, isCastle: false));
 	}
 }
