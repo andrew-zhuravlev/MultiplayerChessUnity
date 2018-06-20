@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 23608450056538458}
   m_Layer: 9
   m_Name: Castle Move Highlighter
-  m_TagString: Castle Move Highlighter
+  m_TagString: Move Highlighter
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -90,7 +90,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1875759773851522}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 2.5, y: 0.5, z: 2.5}

@@ -28,7 +28,7 @@ public class Player : NetworkBehaviour
 			return;
 
 		CheckSelection();
-		CheckMovement();
+		CheckAction();
 	}
 
 	void CheckSelection()
@@ -64,7 +64,7 @@ public class Player : NetworkBehaviour
 		}
 	}
 
-	void CheckMovement()
+	void CheckAction()
 	{
 		if (!Input.GetMouseButtonDown(0))
 			return;
@@ -96,7 +96,10 @@ public class Player : NetworkBehaviour
 		int boardToX = board.GetBoardPos(toX_World);
 		int boardToZ = board.GetBoardPos(toZ_World);
 
-		if (!identityChessman.GetValidMoves().Any(move => move.x == boardToX && move.z == boardToZ))
+		List<Move> allValidMoves = identityChessman.GetValidMoves();
+		int validMoveIndex = allValidMoves.FindIndex(move => move.x == boardToX && move.z == boardToZ);
+
+		if (validMoveIndex == -1)
 		{
 			Debug.LogError("NOT LEGIT MOVE");
 			return;
@@ -105,22 +108,25 @@ public class Player : NetworkBehaviour
 		King kingComponent = identityChessman as King;
 		bool isKing = kingComponent != null;
 
-		if (isKing && kingComponent.Y_Board - board.GetBoardPos(toZ_World) == 0)
+		if (allValidMoves[validMoveIndex].isKill)
+		{
+			NetworkIdentity toKill = board.GetComponentInChessman<NetworkIdentity>(allValidMoves[validMoveIndex].z, allValidMoves[validMoveIndex].x);
+			board.RemoveChessman(toKill.GetComponent<Chessman>());
+
+			GameObject test = NetworkServer.FindLocalObject(toKill.netId);
+			NetworkServer.Destroy(test);
+		}
+
+		else if (allValidMoves[validMoveIndex].isCastle)
 		{
 			int xDelta = board.GetBoardPos(toX_World) - kingComponent.X_Board;
+			int row = kingComponent.isWhite ? 0 : 7;
 
-			if (xDelta == 2 || xDelta == -3)
-			{
-				int row = kingComponent.isWhite ? 0 : 7;
+			int rookOldX = xDelta == -3 ? 0 : 7;
+			int rookNewX = xDelta == -3 ? 2 : 5;
 
-				int rookOldX = xDelta == -3 ? 0 : 7;
-				int rookNewX = xDelta == -3 ? 2 : 5;
-
-				bool rookIsWhite = row == 0;
-
-				Chessman rook = board.GetChessmanByBoardIndex(row, rookOldX);
-				ServerMoveFigure(rook, rook.GetComponent<NetworkIdentity>(), row, rookOldX, board.GetWorldPos(row), board.GetWorldPos(rookNewX), rookIsWhite, false);
-			}
+			Chessman rook = board.GetComponentInChessman<Chessman>(row, rookOldX);
+			ServerMoveFigure(rook, rook.GetComponent<NetworkIdentity>(), row, rookOldX, board.GetWorldPos(row), board.GetWorldPos(rookNewX), row == 0, false);
 		}
 
 		board.SwapPlayer();

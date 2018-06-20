@@ -16,6 +16,10 @@ public class PlayerCamera : MonoBehaviour
 	[SerializeField] float maxInZoom;
 	[SerializeField] float maxOutZoom;
 
+	[Header("Camera up and down")]
+	[SerializeField] float maxRotation;
+	[SerializeField] float minRotation;
+
 	float curZoom = 0;
 	Vector3 prevMousePos;
 
@@ -57,8 +61,14 @@ public class PlayerCamera : MonoBehaviour
 		if (Input.GetMouseButton(mouseButton))
 		{
 			Vector3 delta = (curMousePos - prevMousePos).normalized;
+
 			transform.RotateAround(center, Vector3.up, delta.x * Time.deltaTime * rotationSpeedX);
-			transform.RotateAround(center, transform.right, -delta.y * Time.deltaTime * rotationSpeedY);
+
+			float toRotateOnY = -delta.y * Time.deltaTime * rotationSpeedY;
+			float xCam = transform.rotation.eulerAngles.x;
+
+			if (toRotateOnY >= 0 && xCam < maxRotation || toRotateOnY <= 0 && xCam > minRotation)
+				transform.RotateAround(center, transform.right, toRotateOnY);
 		}
 		prevMousePos = curMousePos;
 	}

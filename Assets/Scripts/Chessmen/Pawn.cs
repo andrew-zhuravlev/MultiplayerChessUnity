@@ -41,7 +41,7 @@ public class Pawn : Chessman
 
 		bool isValidMove = validKillMove || validForwardMove;
 		if (checkFriendlyKingSafety)
-			isValidMove = isValidMove && !(isWhite ? this.board.WhiteKing : this.board.BlackKing).WillBeKilledAfterMove(Y_Board, X_Board, endY, endX, null);
+			isValidMove = isValidMove && !(isWhite ? Board.Instance.WhiteKing : Board.Instance.BlackKing).WillBeKilledAfterMove(Y_Board, X_Board, endY, endX, null);
 
 		if (isValidMove)
 			validMoves.Add(new Move(endY, endX, isKill: validKillMove, isCastle: false));

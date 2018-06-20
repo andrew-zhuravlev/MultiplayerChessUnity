@@ -20,11 +20,23 @@ public class ObjectPoolItem
 public class ObjectPooler : MonoBehaviour
 {
 	public static ObjectPooler Instance;
-
+	/// <summary>
+	/// These are the prefabs to pool.
+	/// </summary>
 	public List<ObjectPoolItem> itemsToPool;
 
+	/// <summary>
+	/// Just ALL objects (active and inactive held by ObjectPooler class).
+	/// </summary>
 	public List<List<GameObject>> pooledObjectsList;
+	/// <summary>
+	/// This is helping list which will be added to pooledObjectsList afterwards.
+	/// Only used in ObjectPoolItemToPooledObject().
+	/// </summary>
 	public List<GameObject> pooledObjects;
+	/// <summary>
+	/// Holds an index of last active item as far as I understood.
+	/// </summary>
 	List<int> positions;
 
 	void Awake()
@@ -92,6 +104,8 @@ public class ObjectPooler : MonoBehaviour
 		ObjectPoolItem item = itemsToPool[index];
 
 		pooledObjects = new List<GameObject>();
+		
+		//Here we instantiate all objects and deactivate.
 		for (int i = 0; i < item.amountToPool; i++)
 		{
 			GameObject obj = Instantiate(item.objectToPool);
@@ -99,6 +113,8 @@ public class ObjectPooler : MonoBehaviour
 			obj.transform.parent = this.transform;
 			pooledObjects.Add(obj);
 		}
+
+
 		pooledObjectsList.Add(pooledObjects);
 		positions.Add(0);
 	}

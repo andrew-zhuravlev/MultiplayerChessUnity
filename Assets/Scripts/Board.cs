@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Networking;
+using System;
 
 public class Board : NetworkBehaviour
 {
@@ -22,7 +23,14 @@ public class Board : NetworkBehaviour
 	public King BlackKing { get; private set; }
 	public List<Chessman> WhiteChessmen { get; private set; }
 	public List<Chessman> BlackChessmen { get; private set; }
-	public Dictionary<int, Transform> AllChessmen { get; private set; }
+	
+	public void RemoveChessman(Chessman toRemove)
+	{
+		if (toRemove.isWhite)
+			WhiteChessmen.Remove(toRemove);
+		else
+			BlackChessmen.Remove(toRemove);
+	}
 
 	Cell[,] cells;
 	public Cell[,] GetCells()
@@ -55,21 +63,21 @@ public class Board : NetworkBehaviour
 
 	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
 
-	public Chessman GetChessmanByBoardIndex(int y, int x)
+	public TComponent GetComponentInChessman<TComponent>(int z_Board, int x_Board)
 	{
 		RaycastHit hit;
-		Ray ray = new Ray(new Vector3(GetWorldPos(x), 30f, GetWorldPos(y)), Vector3.down);
+		Ray ray = new Ray(new Vector3(GetWorldPos(x_Board), 30f, GetWorldPos(z_Board)), Vector3.down);
 
 		if (Physics.Raycast(ray, out hit, 30f, LayerMask.GetMask("Chessmen")))
-			return hit.collider.GetComponent<Chessman>();
+			return hit.collider.GetComponent<TComponent>();
 
-		Debug.LogWarning("GetChessmanByBoardIndex:: Collider not found. Position: (" + y + " " + x + ")");
-		return null;
+		Debug.LogWarning("GetChessmanByBoardIndex:: Collider not found. Position: (" + z_Board + " " + x_Board + ")");
+		return default(TComponent);
 	}
 
 	public bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
 	{
-		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x)) 
+		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
 	}
 	#endregion
@@ -87,7 +95,6 @@ public class Board : NetworkBehaviour
 
 		WhiteChessmen = new List<Chessman>();
 		BlackChessmen = new List<Chessman>();
-		AllChessmen = new Dictionary<int, Transform>();
 
 		for (int i = 0; i < chessmen.Length; i++)
 		{
@@ -99,16 +106,13 @@ public class Board : NetworkBehaviour
 
 		King[] kings = FindObjectsOfType<King>();
 
-		for(int i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			if (kings[i].isWhite)
 				WhiteKing = kings[i];
 			else
 				BlackKing = kings[i];
 		}
-
-		foreach (var c in chessmen)
-			AllChessmen.Add(c.transform.GetInstanceID(), c.transform);
 	}
 
 	void Init_Cells()
@@ -151,7 +155,7 @@ public class Board : NetworkBehaviour
 
 			else if (p.isKill)
 			{
-				Chessman chessman = GetChessmanByBoardIndex(p.z, p.x);
+				Chessman chessman = GetComponentInChessman<Chessman>(p.z, p.x);
 
 				//Getting the height of Red Cube above the figure to kill.
 				//My figures will be replaced anyway, this should be fixed.
@@ -184,13 +188,15 @@ public class Board : NetworkBehaviour
 		}
 	}
 
-	//TODO: Optimize.
 	public void RemoveHighlighters()
 	{
-		foreach (var moveHighlighter in GameObject.FindGameObjectsWithTag("Move Highlighter"))
-			moveHighlighter.SetActive(false);
-
-		foreach (var castleMoveHighlighter in GameObject.FindGameObjectsWithTag("Castle Move Highlighter"))
-			castleMoveHighlighter.SetActive(false);
+		for (int i = 0; i < 3; i++)
+		{
+			foreach (GameObject pooled in ObjectPooler.Instance.GetAllPooledObjects(i))
+			{
+				if (pooled.activeInHierarchy)
+					pooled.SetActive(false);
+			}
+		}
 	}
 }
