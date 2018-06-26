@@ -65,12 +65,7 @@ public class Board : NetworkBehaviour
 
 	public void RemoveChessman(Chessman toRemove)
 	{
-		Debug.Log("RemoveChessman() -- " + toRemove.name);
-
-		if (toRemove.isWhite)
-			WhiteChessmen.Remove(toRemove);
-		else
-			BlackChessmen.Remove(toRemove);
+		(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
 	}
 	
 	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
