@@ -4,6 +4,7 @@ using System.Linq;
 public class King : Chessman
 {
 	bool hasMoved = false;
+	bool wasUnderThreat = false;
 
 	List<Chessman> Enemies
 	{
@@ -50,14 +51,21 @@ public class King : Chessman
 
 	void CheckCastle(List<Move> validMoves)
 	{
-		if (hasMoved || IsUnderThreat())
+		if (wasUnderThreat || hasMoved)
 			return;
+
+		if (IsUnderThreat())
+		{
+			wasUnderThreat = true;
+			return;
+		}
 
 		int row = isWhite ? 0 : 7;
 		Rook rook = Board.Instance.GetComponentInChessman<Rook>(row, 7);
 
-		if (rook != null 
-			&& (isWhite ? rook.isWhite : !rook.isWhite) 
+		if (rook != null
+			&& !rook.hasMoved
+			&& (isWhite == rook.isWhite) 
 			&& Board.Instance.GetCells()[row, 5] == Cell.Empty
 			&& Board.Instance.GetCells()[row, 6] == Cell.Empty
 			
@@ -69,8 +77,9 @@ public class King : Chessman
 
 		rook = Board.Instance.GetComponentInChessman<Rook>(row, 0);
 
-		if (rook != null 
-			&& (isWhite ? rook.isWhite : !rook.isWhite) 
+		if (rook != null
+			&& !rook.hasMoved 
+			&& (isWhite == rook.isWhite) 
 			&& Board.Instance.GetCells()[row, 1] == Cell.Empty
 			&& Board.Instance.GetCells()[row, 2] == Cell.Empty
 			&& Board.Instance.GetCells()[row, 3] == Cell.Empty

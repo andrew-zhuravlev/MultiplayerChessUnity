@@ -21,9 +21,10 @@ GameObject:
   - component: {fileID: 4492670499243928}
   - component: {fileID: 33120021674405874}
   - component: {fileID: 23594800495448162}
-  - component: {fileID: 65641135423462898}
   - component: {fileID: 114782423765523236}
   - component: {fileID: 114701113065182864}
+  - component: {fileID: 136968231057893708}
+  - component: {fileID: 65940772902967406}
   m_Layer: 8
   m_Name: White Knight
   m_TagString: Knight
@@ -38,7 +39,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1038715794840050}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 9, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -85,7 +86,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1038715794840050}
   m_Mesh: {fileID: 4300000, guid: 37fa4b41bc7842542bb795f93ea1073b, type: 3}
---- !u!65 &65641135423462898
+--- !u!65 &65940772902967406
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -95,8 +96,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5.8502083, y: 11.248383, z: 5.850208}
-  m_Center: {x: 0, y: 5.637516, z: 0.00000059604656}
+  m_Size: {x: 5.8502083, y: 2.2728653, z: 5.850208}
+  m_Center: {x: -3.3881286e-21, y: 1.1497574, z: 0.00000071525574}
 --- !u!114 &114701113065182864
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -128,7 +129,7 @@ MonoBehaviour:
     i14: 1
     i15: 166
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 1
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114782423765523236
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -141,3 +142,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isWhite: 1
+--- !u!136 &136968231057893708
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1038715794840050}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 1.9223983
+  m_Height: 11.248383
+  m_Direction: 1
+  m_Center: {x: 1.6940691e-21, y: 5.637516, z: 0.00000059604656}

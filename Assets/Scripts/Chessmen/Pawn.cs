@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-//TODO: Взятие на проходе
 public class Pawn : Chessman
 {
 	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)
@@ -45,22 +44,5 @@ public class Pawn : Chessman
 
 		if (isValidMove)
 			validMoves.Add(new Move(endY, endX, isKill: validKillMove, isCastle: false));
-	}
-
-	public override void OnMove(int z, int x)
-	{
-		if (isWhite ? Y_Board == 7 : Y_Board == 0)
-			TurnIntoQueen();
-	}
-
-	void TurnIntoQueen()
-	{
-		//TODO:
-		//Something to do with networking
-		//Instantiate(isWhite ? ObjectPooler.SharedInstance.GetPooledObject(2) : ObjectPooler.SharedInstance.GetPooledObject(3));
-
-		//Probably use NetworkServer.Spawn(); or NetworkServer.SpawnWithClientAuthority();
-
-		Destroy(gameObject);
 	}
 }

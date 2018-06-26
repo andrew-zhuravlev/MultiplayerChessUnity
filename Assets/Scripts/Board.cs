@@ -19,18 +19,14 @@ public class Board : NetworkBehaviour
 	#endregion
 
 	#region Variables
+	public GameObject WhiteQueenPrefab { get; private set; }
+	public GameObject BlackQueenPrefab { get; private set; }
+
 	public King WhiteKing { get; private set; }
 	public King BlackKing { get; private set; }
+
 	public List<Chessman> WhiteChessmen { get; private set; }
 	public List<Chessman> BlackChessmen { get; private set; }
-	
-	public void RemoveChessman(Chessman toRemove)
-	{
-		if (toRemove.isWhite)
-			WhiteChessmen.Remove(toRemove);
-		else
-			BlackChessmen.Remove(toRemove);
-	}
 
 	Cell[,] cells;
 	public Cell[,] GetCells()
@@ -59,6 +55,24 @@ public class Board : NetworkBehaviour
 	#endregion
 
 	#region Helper Methods
+	public void AddQueenToList(Queen queen, bool isWhite)
+	{
+		if (isWhite)
+			WhiteChessmen.Add(queen);
+		else
+			BlackChessmen.Add(queen);
+	}
+
+	public void RemoveChessman(Chessman toRemove)
+	{
+		Debug.Log("RemoveChessman() -- " + toRemove.name);
+
+		if (toRemove.isWhite)
+			WhiteChessmen.Remove(toRemove);
+		else
+			BlackChessmen.Remove(toRemove);
+	}
+	
 	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
 
 	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
@@ -87,6 +101,9 @@ public class Board : NetworkBehaviour
 	{
 		Init_Cells();
 		Init_Chessmen();
+
+		WhiteQueenPrefab = Resources.Load("White Queen", typeof(GameObject)) as GameObject;
+		BlackQueenPrefab = Resources.Load("Black Queen", typeof(GameObject)) as GameObject;
 	}
 
 	void Init_Chessmen()
@@ -128,6 +145,12 @@ public class Board : NetworkBehaviour
 	}
 	#endregion
 
+	#region Cell Methods
+	public void FreeCell(int z, int x)
+	{
+		cells[z, x] = Cell.Empty;
+	}
+
 	public void SetCell(int fromZ, int fromX, int toZ, int toX, bool isWhite, bool isKing)
 	{
 		GetCells()[fromZ, fromX] = Cell.Empty;
@@ -136,7 +159,9 @@ public class Board : NetworkBehaviour
 		if (isKing)
 			GetCells()[toZ, toX] |= Cell.King;
 	}
+	#endregion
 
+	#region Highlighters
 	public void DisplayHighlighters(List<Move> possibleMoves)
 	{
 		if (possibleMoves.Count() == 0)
@@ -198,5 +223,6 @@ public class Board : NetworkBehaviour
 					pooled.SetActive(false);
 			}
 		}
-	}
+	} 
+	#endregion
 }
