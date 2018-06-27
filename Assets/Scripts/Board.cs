@@ -98,13 +98,9 @@ public class Board : NetworkBehaviour
 		BlackQueenPrefab = Resources.Load("Black Queen", typeof(GameObject)) as GameObject;
 	}
 
-	// TODO: Not only cells but Chessman also.
+	// This should work, but on the FOR_TESTING Scene obviously should be both kings.
 	void Init_Chessmen()
 	{
-		// This might be FOR_TESTING Scene.
-#if UNITY_EDITOR
-		CellUtils.UpdateCells();
-#else
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
 
 		WhiteChessmen = new List<Chessman>();
@@ -127,11 +123,14 @@ public class Board : NetworkBehaviour
 			else
 				BlackKing = kings[i];
 		}
-#endif
 	}
 
 	void Init_Cells()
-	{
+	{       
+		// This might be FOR_TESTING Scene.
+#if UNITY_EDITOR
+		CellUtils.UpdateCells();
+#else
 		cells = new Cell[8, 8];
 
 		for (int i = 0; i < 4; i++)
@@ -140,10 +139,11 @@ public class Board : NetworkBehaviour
 
 		GetCells()[0, 4] |= Cell.King;
 		GetCells()[7, 4] |= Cell.King;
+#endif
 	}
-	#endregion
+#endregion
 
-	#region Cell Methods
+#region Cell Methods
 	public void FreeCell(int z, int x)
 	{
 		cells[z, x] = Cell.Empty;
@@ -157,9 +157,9 @@ public class Board : NetworkBehaviour
 		if (isKing)
 			GetCells()[toZ, toX] |= Cell.King;
 	}
-	#endregion
+#endregion
 
-	#region Highlighters
+#region Highlighters
 	public void DisplayHighlighters(List<Move> possibleMoves)
 	{
 		if (possibleMoves.Count() == 0)
@@ -222,5 +222,5 @@ public class Board : NetworkBehaviour
 			}
 		}
 	}
-	#endregion
+#endregion
 }
