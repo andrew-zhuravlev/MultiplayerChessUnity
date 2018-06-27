@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Board : NetworkBehaviour
 {
@@ -98,7 +99,6 @@ public class Board : NetworkBehaviour
 		BlackQueenPrefab = Resources.Load("Black Queen", typeof(GameObject)) as GameObject;
 	}
 
-	// This should work, but on the FOR_TESTING Scene obviously should be both kings.
 	void Init_Chessmen()
 	{
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
@@ -129,12 +129,20 @@ public class Board : NetworkBehaviour
 	{
 		cells = new Cell[8, 8];
 
-		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 8; j++)
-				GetCells()[i < 2 ? i : i + 4, j] = i < 2 ? Cell.WhiteFigure : Cell.BlackFigure;
+		if (SceneManager.GetActiveScene().name == "Game")
+		{
+			for (int i = 0; i < 4; i++)
+				for (int j = 0; j < 8; j++)
+					GetCells()[i < 2 ? i : i + 4, j] = i < 2 ? Cell.WhiteFigure : Cell.BlackFigure;
 
-		GetCells()[0, 4] |= Cell.King;
-		GetCells()[7, 4] |= Cell.King;
+			GetCells()[0, 4] |= Cell.King;
+			GetCells()[7, 4] |= Cell.King;
+		}
+		// FOR_TEST Scene.
+		else
+		{
+			CellUtils.UpdateCells();
+		}
 	}
 	#endregion
 
