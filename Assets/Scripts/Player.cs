@@ -5,10 +5,11 @@ using System.Linq;
 
 public class Player : NetworkBehaviour
 {
+	// For performance and conveniency.
+	Board board;
+
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessman_NetworkIdentity;
-
-	Board board;
 
 	void Start()
 	{
@@ -97,8 +98,8 @@ public class Player : NetworkBehaviour
 
 		Chessman identityChessman = identity.GetComponent<Chessman>();
 
-		int boardToX = board.GetBoardPos(toX_World);
-		int boardToZ = board.GetBoardPos(toZ_World);
+		int boardToX = board.GetBoardPos(toX_World),
+			boardToZ = board.GetBoardPos(toZ_World);
 
 		List<Move> allValidMoves = identityChessman.GetValidMoves();
 		int validMoveIndex = allValidMoves.FindIndex(move => move.x == boardToX && move.z == boardToZ);
@@ -117,84 +118,54 @@ public class Player : NetworkBehaviour
 		{
 			pawnGotToEnd = identityChessman.isWhite ? board.GetBoardPos(toZ_World) == 7 : board.GetBoardPos(toZ_World) == 0;
 			if (pawnGotToEnd)
-			{
-				GameObject queen = Instantiate(identityChessman.isWhite ? board.WhiteQueenPrefab : board.BlackQueenPrefab,
-					new Vector3(toX_World, 0, toZ_World), Quaternion.identity);
-				Queen queen_QueenComponent = queen.GetComponent<Queen>();
-
-				NetworkServer.Spawn(queen);
-
-				board.AddQueenToList(queen_QueenComponent, identityChessman.isWhite);
-				RpcAddQueenToList(queen.GetComponent<NetworkIdentity>(), identityChessman.isWhite);
-
-				NetworkIdentity pawnToKill = board.GetComponentInChessman<NetworkIdentity>(fromZ_Board, fromX_Board);
-				ServerKillFigure(pawnToKill);
-
-				board.SetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), queen_QueenComponent.isWhite, false);
-				RpcSetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), queen_QueenComponent.isWhite, false);
-			}
+				ServerTurnPawnIntoQueen(fromZ_Board, fromX_Board, toZ_World, toX_World, identityChessman);
 		}
 
 		if (allValidMoves[validMoveIndex].isKill)
 		{
 			NetworkIdentity toKill = board.GetComponentInChessman<NetworkIdentity>(allValidMoves[validMoveIndex].z, allValidMoves[validMoveIndex].x);
-			ServerKillFigure(toKill);
+			NetworkServer.Destroy(NetworkServer.FindLocalObject(toKill.netId));
 		}
 
 		else if (allValidMoves[validMoveIndex].isCastle)
-		{
-			int xDelta = board.GetBoardPos(toX_World) - kingComponent.X_Board;
-			int row = kingComponent.isWhite ? 0 : 7;
-
-			int rookOldX = xDelta == -3 ? 0 : 7;
-			int rookNewX = xDelta == -3 ? 2 : 5;
-
-			Chessman rook = board.GetComponentInChessman<Chessman>(row, rookOldX);
-			ServerMoveFigure(rook, rook.GetComponent<NetworkIdentity>(), row, rookOldX, board.GetWorldPos(row), board.GetWorldPos(rookNewX), row == 0, false);
-		}
+			SetRookPositionInCastle(toX_World, kingComponent);
 
 		board.SwapPlayer();
 
 		if (!pawnGotToEnd)
-			ServerMoveFigure(identityChessman, identity, fromZ_Board, fromX_Board, toZ_World, toX_World, identityChessman.isWhite, isKing);
+			RpcMoveFigure(identity, fromZ_Board, fromX_Board, toZ_World, toX_World, identityChessman.isWhite, isKing);
 	}
 
 	[Server]
-	void ServerKillFigure(NetworkIdentity toKill)
+	void SetRookPositionInCastle(int toX_World, King kingComponent)
 	{
-		Chessman toKill_Chessman = toKill.GetComponent<Chessman>();
+		int xDelta = board.GetBoardPos(toX_World) - kingComponent.X_Board;
+		int row = kingComponent.isWhite ? 0 : 7;
 
-		int z_Board = toKill_Chessman.Y_Board;
-		int x_Board = toKill_Chessman.X_Board;
-		bool isWhite = toKill_Chessman.isWhite;
+		int rookOldX = xDelta == -3 ? 0 : 7;
+		int rookNewX = xDelta == -3 ? 2 : 5;
 
-		board.RemoveChessman(toKill_Chessman);
-
-		RpcRemoveChessmanFromBoard(isWhite, z_Board, x_Board);
-
-		NetworkServer.Destroy(NetworkServer.FindLocalObject(toKill.netId));
+		Chessman rook = board.GetComponentInChessman<Chessman>(row, rookOldX);
+		RpcMoveFigure(rook.GetComponent<NetworkIdentity>(), row, rookOldX, board.GetWorldPos(row), board.GetWorldPos(rookNewX), row == 0, false);
 	}
 
 	[Server]
-	void ServerMoveFigure(Chessman chessman, NetworkIdentity networkIdentity, int fromZ_Board, int fromX_Board, int toZ_World, int toX_World, bool isWhite, bool isKing)
+	void ServerTurnPawnIntoQueen(int fromZ_Board, int fromX_Board, int toZ_World, int toX_World, Chessman identityChessman)
 	{
-		board.SetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), isWhite, isKing);
-		RpcMoveFigure(networkIdentity, fromZ_Board, fromX_Board, toZ_World, toX_World, isWhite, isKing);
-		chessman.OnMove(toZ_World, toX_World);
+		GameObject queen = Instantiate(identityChessman.isWhite ? board.WhiteQueenPrefab : board.BlackQueenPrefab,
+			new Vector3(toX_World, 0, toZ_World), Quaternion.identity);
+		NetworkServer.Spawn(queen);
+
+		NetworkIdentity pawnToKill = board.GetComponentInChessman<NetworkIdentity>(fromZ_Board, fromX_Board);
+		NetworkServer.Destroy(NetworkServer.FindLocalObject(pawnToKill.netId));
+
+		RpcSetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), queen.GetComponent<Queen>().isWhite, false);
 	}
 
 	[ClientRpc]
 	void RpcAddQueenToList(NetworkIdentity queen, bool isWhite)
 	{
-		// TODO: Check if data is valid before doing this.
 		board.AddQueenToList(queen.GetComponent<Queen>(), isWhite);
-	}
-
-	[ClientRpc]
-	void RpcRemoveChessmanFromBoard(bool isWhite, int z_Board, int x_Board)
-	{
-		if(!isServer)
-			board.RemoveChessman((isWhite ? board.WhiteChessmen : board.BlackChessmen).First(chessman => chessman.Y_Board == z_Board && chessman.X_Board == x_Board));
 	}
 
 	[ClientRpc]

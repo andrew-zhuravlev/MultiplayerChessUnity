@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-//TODO: Fix the problem where after the move of knight nobody can move
 public class Knight : Chessman
 {
 	protected override List<Move> GetValidMoves(bool checkFriendlyKingSafety, Cell[,] board)

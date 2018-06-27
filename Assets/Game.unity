@@ -221,6 +221,11 @@ Prefab:
       propertyPath: m_LocalPlayerAuthority
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114324481205929996, guid: 90dbf5bd517d6ba409c68f469c963dd8,
+        type: 2}
+      propertyPath: addToListOnStartup
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 90dbf5bd517d6ba409c68f469c963dd8, type: 2}
   m_IsPrefabParent: 0
@@ -537,6 +542,11 @@ Prefab:
     - target: {fileID: 114140516661278250, guid: 7495acd7831a51d49b42c0b3b075adaf,
         type: 2}
       propertyPath: m_LocalPlayerAuthority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114459079051042888, guid: 7495acd7831a51d49b42c0b3b075adaf,
+        type: 2}
+      propertyPath: addToListOnStartup
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2334,8 +2344,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed870cbca442b7248a6b5a6070009a14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiteQueenPrefab: {fileID: 0}
-  blackQueenPrefab: {fileID: 0}
 --- !u!114 &1992055184
 MonoBehaviour:
   m_ObjectHideFlags: 0

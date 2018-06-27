@@ -1,5 +1,4 @@
-﻿// TODO: Not quite sure for isKill and isCastle
-public struct Move
+﻿public struct Move
 {
 	public int z;
 	public int x;

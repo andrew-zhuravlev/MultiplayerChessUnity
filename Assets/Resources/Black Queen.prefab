@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 136380574745360888}
   - component: {fileID: 114802147425981100}
   - component: {fileID: 114140516661278250}
+  - component: {fileID: 114459079051042888}
   m_Layer: 8
   m_Name: Black Queen
   m_TagString: Queen
@@ -130,6 +131,18 @@ MonoBehaviour:
     i15: 175
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114459079051042888
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1189455942717334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a76382fef71b5944a96b8fc2158501e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  addToListOnStartup: 1
 --- !u!114 &114802147425981100
 MonoBehaviour:
   m_ObjectHideFlags: 1

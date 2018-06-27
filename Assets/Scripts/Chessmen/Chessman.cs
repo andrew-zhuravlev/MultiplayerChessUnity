@@ -16,6 +16,11 @@ public abstract class Chessman : MonoBehaviour
 			.Any(move => move.isKill && (newBoard[move.z, move.x] & Cell.King) == Cell.King);
 	}
 
+	protected void OnDestroy()
+	{
+		Board.Instance.RemoveChessman(this);
+	}
+
 	public bool CanKillCell(int y, int x)
 	{
 		return GetValidMoves(checkFriendlyKingSafety: false, board: Board.Instance.GetCells())

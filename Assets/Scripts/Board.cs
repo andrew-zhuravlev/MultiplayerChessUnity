@@ -57,17 +57,14 @@ public class Board : NetworkBehaviour
 	#region Helper Methods
 	public void AddQueenToList(Queen queen, bool isWhite)
 	{
-		if (isWhite)
-			WhiteChessmen.Add(queen);
-		else
-			BlackChessmen.Add(queen);
+		(isWhite ? WhiteChessmen : BlackChessmen).Add(queen);
 	}
 
 	public void RemoveChessman(Chessman toRemove)
 	{
 		(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
 	}
-	
+
 	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
 
 	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
@@ -101,8 +98,13 @@ public class Board : NetworkBehaviour
 		BlackQueenPrefab = Resources.Load("Black Queen", typeof(GameObject)) as GameObject;
 	}
 
+	// TODO: Not only cells but Chessman also.
 	void Init_Chessmen()
 	{
+		// This might be FOR_TESTING Scene.
+#if UNITY_EDITOR
+		CellUtils.UpdateCells();
+#else
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
 
 		WhiteChessmen = new List<Chessman>();
@@ -125,6 +127,7 @@ public class Board : NetworkBehaviour
 			else
 				BlackKing = kings[i];
 		}
+#endif
 	}
 
 	void Init_Cells()
@@ -218,6 +221,6 @@ public class Board : NetworkBehaviour
 					pooled.SetActive(false);
 			}
 		}
-	} 
+	}
 	#endregion
 }
