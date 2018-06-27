@@ -26,6 +26,7 @@ public class Board : NetworkBehaviour
 	public King WhiteKing { get; private set; }
 	public King BlackKing { get; private set; }
 
+	// All Chessmen, including Kings.
 	public List<Chessman> WhiteChessmen { get; private set; }
 	public List<Chessman> BlackChessmen { get; private set; }
 
@@ -132,8 +133,10 @@ public class Board : NetworkBehaviour
 		if (SceneManager.GetActiveScene().name == "Game")
 		{
 			for (int i = 0; i < 4; i++)
+			{
 				for (int j = 0; j < 8; j++)
 					GetCells()[i < 2 ? i : i + 4, j] = i < 2 ? Cell.WhiteFigure : Cell.BlackFigure;
+			}
 
 			GetCells()[0, 4] |= Cell.King;
 			GetCells()[7, 4] |= Cell.King;
