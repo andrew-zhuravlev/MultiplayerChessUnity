@@ -146,17 +146,17 @@ public class Player : NetworkBehaviour
 		{
 			if (!friendsHaveValidMoves)
 			{
-				Debug.Log("Checkmate.");
+				board.EndGame(referencedChessman.isWhite);
 			}
+			// TODO: Visuals.
 			else
-			{
 				Debug.Log("Check.");
-			}
 		}
 		// Draw: No valid moves and no Check.
 		else if (!friendsHaveValidMoves)
 		{
 			Debug.Log("Draw");
+			board.EndGame(null);
 		}
 	}
 

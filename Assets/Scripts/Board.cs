@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.SceneManagement;
 
+// TODO: Randomly distribute black and white.
 // a GameManager.
 public class Board : NetworkBehaviour
 {
@@ -20,7 +21,6 @@ public class Board : NetworkBehaviour
 	}
 	#endregion
 
-	#region Variables
 	public GameObject WhiteQueenPrefab { get; private set; }
 	public GameObject BlackQueenPrefab { get; private set; }
 
@@ -55,9 +55,32 @@ public class Board : NetworkBehaviour
 	}
 
 	const int CELL_SIZE = 9;
-	#endregion
 
-	#region Helper Methods
+	GameEnd _gameEnd = GameEnd.None;
+
+	[Server]
+	public void EndGame(bool? whiteIsWinner)
+	{
+		Debug.Log("EndGame().");
+
+		if (!whiteIsWinner.HasValue)
+			_gameEnd = GameEnd.Draw;
+
+		else if (whiteIsWinner.Value)
+			_gameEnd = GameEnd.ServerWin;
+
+		else
+			_gameEnd = GameEnd.ClientWin;
+
+		RpcDisplayWinLoseUI(_gameEnd);
+	}
+
+	[ClientRpc]
+	void RpcDisplayWinLoseUI(GameEnd end)
+	{
+		GetComponent<UI>().DisplayEndGameUI(end);
+	}
+
 	public void AddQueenToList(Queen queen, bool isWhite)
 	{
 		(isWhite ? WhiteChessmen : BlackChessmen).Add(queen);
@@ -90,9 +113,7 @@ public class Board : NetworkBehaviour
 		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
 	}
-	#endregion
 
-	#region Initialization
 	public void Init()
 	{
 		Init_Cells();
@@ -151,9 +172,7 @@ public class Board : NetworkBehaviour
 			CellUtils.UpdateCells();
 		}
 	}
-	#endregion
 
-	#region Cell Methods
 	public void FreeCell(int z, int x)
 	{
 		cells[z, x] = Cell.Empty;
@@ -167,9 +186,7 @@ public class Board : NetworkBehaviour
 		if (isKing)
 			GetCells()[toZ, toX] |= Cell.King;
 	}
-	#endregion
 
-	#region Highlighters
 	public void DisplayHighlighters(List<Move> possibleMoves)
 	{
 		if (possibleMoves.Count() == 0)
@@ -232,5 +249,4 @@ public class Board : NetworkBehaviour
 			}
 		}
 	}
-	#endregion
 }
