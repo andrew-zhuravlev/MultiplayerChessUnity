@@ -65,7 +65,6 @@ public class Board : NetworkBehaviour
 
 	public void RemoveChessman(Chessman toRemove)
 	{
-		Debug.Log("Remove chessman: " + toRemove.name);
 		if ((toRemove.isWhite ? WhiteChessmen : BlackChessmen) != null)
 			(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
 	}

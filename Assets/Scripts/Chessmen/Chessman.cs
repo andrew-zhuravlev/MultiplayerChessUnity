@@ -10,15 +10,7 @@ public abstract class Chessman : MonoBehaviour
 	{
 		Debug.Log("OnDisable");
 
-		if (Board.Instance != null && this != null)
-			Board.Instance.RemoveChessman(this);
-	}
-
-	protected void OnDestroy()
-	{
-		Debug.Log("OnDestroy");
-
-		if(Board.Instance != null)
+		if (Board.Instance != null)
 			Board.Instance.RemoveChessman(this);
 	}
 
