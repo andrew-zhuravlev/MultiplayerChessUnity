@@ -93,7 +93,7 @@ public class Player : NetworkBehaviour
 	[Command]
 	void CmdMoveFigure(NetworkIdentity identity, int fromZ_Board, int fromX_Board, int toZ_World, int toX_World)
 	{
-		if (NetworkServer.connections.Count < 2)
+		if (NetworkServer.connections.Count != 2)
 			return;
 
 		Chessman identityChessman = identity.GetComponent<Chessman>();
@@ -114,18 +114,19 @@ public class Player : NetworkBehaviour
 		bool isKing = kingComponent != null;
 		bool pawnGotToEnd = false;
 
+		if (allValidMoves[validMoveIndex].isKill)
+		{
+			Debug.Log("Entered is kill");
+
+			NetworkIdentity toKill = board.GetComponentInChessman<NetworkIdentity>(allValidMoves[validMoveIndex].z, allValidMoves[validMoveIndex].x);
+			NetworkServer.Destroy(NetworkServer.FindLocalObject(toKill.netId));
+		}
+
 		if (identityChessman is Pawn)
 		{
 			pawnGotToEnd = identityChessman.isWhite ? board.GetBoardPos(toZ_World) == 7 : board.GetBoardPos(toZ_World) == 0;
 			if (pawnGotToEnd)
 				ServerTurnPawnIntoQueen(fromZ_Board, fromX_Board, toZ_World, toX_World, identityChessman);
-		}
-
-		if (allValidMoves[validMoveIndex].isKill)
-		{
-			Debug.Log("This move is kill");
-			NetworkIdentity toKill = board.GetComponentInChessman<NetworkIdentity>(allValidMoves[validMoveIndex].z, allValidMoves[validMoveIndex].x);
-			NetworkServer.Destroy(NetworkServer.FindLocalObject(toKill.netId));
 		}
 
 		else if (allValidMoves[validMoveIndex].isCastle)
@@ -135,6 +136,28 @@ public class Player : NetworkBehaviour
 
 		if (!pawnGotToEnd)
 			RpcMoveFigure(identity, fromZ_Board, fromX_Board, toZ_World, toX_World, identityChessman.isWhite, isKing);
+	}
+
+	[Server]
+	void IsCheckOrEndGame(Chessman referencedChessman)
+	{
+		bool friendsHaveValidMoves = referencedChessman.EnemyKing.FriendsHaveValidMoves();
+		if (referencedChessman.ThreatForEnemyKing(board.GetCells()))
+		{
+			if (!friendsHaveValidMoves)
+			{
+				Debug.Log("Checkmate.");
+			}
+			else
+			{
+				Debug.Log("Check.");
+			}
+		}
+		// Draw: No valid moves and no Check.
+		else if (!friendsHaveValidMoves)
+		{
+			Debug.Log("Draw");
+		}
 	}
 
 	[Server]
@@ -153,6 +176,8 @@ public class Player : NetworkBehaviour
 	[Server]
 	void ServerTurnPawnIntoQueen(int fromZ_Board, int fromX_Board, int toZ_World, int toX_World, Chessman identityChessman)
 	{
+		Debug.Log("TurnPawnIntoQueen();");
+
 		GameObject queen = Instantiate(identityChessman.isWhite ? board.WhiteQueenPrefab : board.BlackQueenPrefab,
 			new Vector3(toX_World, 0, toZ_World), Quaternion.identity);
 		NetworkServer.Spawn(queen);
@@ -169,6 +194,9 @@ public class Player : NetworkBehaviour
 		board.SetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), isWhite, isKing);
 		identity.transform.position = new Vector3(toX_World, 0, toZ_World);
 		identity.GetComponent<Chessman>().OnMove(toZ_World, toX_World);
+
+		if (isServer)
+			IsCheckOrEndGame(identity.GetComponent<Chessman>());
 	}
 
 	[ClientRpc]

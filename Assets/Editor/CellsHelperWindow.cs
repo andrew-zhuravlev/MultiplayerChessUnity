@@ -27,6 +27,10 @@ public class CellsHelperWindow : EditorWindow
 			}
 
 			DisplayCells();
+
+			// Display amount of chessmen after cells.
+			GUILayout.Label("WhiteChessmen: " + Board.Instance.WhiteChessmen.Count);
+			GUILayout.Label("BlackChessmen: " + Board.Instance.BlackChessmen.Count);
 		}
 		else update = true;
 	}

@@ -6,11 +6,6 @@ public class King : Chessman
 	bool hasMoved = false;
 	bool wasUnderThreat = false;
 
-	List<Chessman> Enemies
-	{
-		get { return isWhite ? Board.Instance.BlackChessmen : Board.Instance.WhiteChessmen; }
-	}
-
 	public override void OnMove(int z, int x)
 	{
 		hasMoved = true;
@@ -95,6 +90,17 @@ public class King : Chessman
 	public bool IsUnderThreat()
 	{
 		return ToBeKilled(Board.Instance.GetCells(), Enemies);
+	}
+
+	// Used in Draw and Checkmate
+	public bool FriendsHaveValidMoves()
+	{
+		foreach(Chessman c in FriendsIncludingMe)
+		{
+			if (c.GetValidMoves().Count > 0)
+				return true;
+		}
+		return false;
 	}
 
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)

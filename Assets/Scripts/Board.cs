@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.SceneManagement;
 
+// a GameManager.
 public class Board : NetworkBehaviour
 {
 	#region Singleton
@@ -64,7 +65,9 @@ public class Board : NetworkBehaviour
 
 	public void RemoveChessman(Chessman toRemove)
 	{
-		(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
+		Debug.Log("Remove chessman: " + toRemove.name);
+		if ((toRemove.isWhite ? WhiteChessmen : BlackChessmen) != null)
+			(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
 	}
 
 	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
@@ -132,6 +135,7 @@ public class Board : NetworkBehaviour
 
 		if (SceneManager.GetActiveScene().name == "Game")
 		{
+			Debug.Log("Game");
 			for (int i = 0; i < 4; i++)
 			{
 				for (int j = 0; j < 8; j++)
@@ -144,6 +148,7 @@ public class Board : NetworkBehaviour
 		// FOR_TEST Scene.
 		else
 		{
+			Debug.Log("FOR_TEST");
 			CellUtils.UpdateCells();
 		}
 	}
