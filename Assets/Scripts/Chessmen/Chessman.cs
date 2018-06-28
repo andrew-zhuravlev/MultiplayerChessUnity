@@ -18,7 +18,8 @@ public abstract class Chessman : MonoBehaviour
 
 	protected void OnDestroy()
 	{
-		Board.Instance.RemoveChessman(this);
+		if(Board.Instance != null)
+			Board.Instance.RemoveChessman(this);
 	}
 
 	public bool CanKillCell(int y, int x)

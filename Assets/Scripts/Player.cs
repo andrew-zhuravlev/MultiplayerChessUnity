@@ -123,6 +123,7 @@ public class Player : NetworkBehaviour
 
 		if (allValidMoves[validMoveIndex].isKill)
 		{
+			Debug.Log("This move is kill");
 			NetworkIdentity toKill = board.GetComponentInChessman<NetworkIdentity>(allValidMoves[validMoveIndex].z, allValidMoves[validMoveIndex].x);
 			NetworkServer.Destroy(NetworkServer.FindLocalObject(toKill.netId));
 		}
@@ -160,12 +161,6 @@ public class Player : NetworkBehaviour
 		NetworkServer.Destroy(NetworkServer.FindLocalObject(pawnToKill.netId));
 
 		RpcSetCell(fromZ_Board, fromX_Board, board.GetBoardPos(toZ_World), board.GetBoardPos(toX_World), queen.GetComponent<Queen>().isWhite, false);
-	}
-
-	[ClientRpc]
-	void RpcAddQueenToList(NetworkIdentity queen, bool isWhite)
-	{
-		board.AddQueenToList(queen.GetComponent<Queen>(), isWhite);
 	}
 
 	[ClientRpc]
