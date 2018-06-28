@@ -8,21 +8,25 @@ public abstract class Chessman : MonoBehaviour
 
 	void OnDisable()
 	{
-		Debug.Log("OnDisable");
-
 		if (Board.Instance != null)
 			Board.Instance.RemoveChessman(this);
 	}
 
-	public int Y_Board { get { return Board.Instance.GetBoardPos((int)transform.position.z); } }
+	public int Y_Board
+	{
+		get { return Board.Instance.GetBoardPos((int)transform.position.z); }
+	}
 
-	public int X_Board { get { return Board.Instance.GetBoardPos((int)transform.position.x); } }
+	public int X_Board
+	{
+		get { return Board.Instance.GetBoardPos((int)transform.position.x); }
+	}
 
 	public King EnemyKing
 	{
 		get { return isWhite ? Board.Instance.BlackKing : Board.Instance.WhiteKing; }
 	}
-	
+
 	public bool ThreatForEnemyKing(Cell[,] newBoard)
 	{
 		return GetValidMoves(checkFriendlyKingSafety: false, board: newBoard)
