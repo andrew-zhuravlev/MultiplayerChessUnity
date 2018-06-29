@@ -9,7 +9,7 @@ public abstract class Chessman : MonoBehaviour
 	void OnDisable()
 	{
 		if (Board.Instance != null)
-			Board.Instance.RemoveChessman(this);
+			Board.Instance.RemoveChessmanFromList(this);
 	}
 
 	public int Y_Board

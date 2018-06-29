@@ -21,6 +21,7 @@ public class Board : NetworkBehaviour
 	}
 	#endregion
 
+	// For spawning when Pawn reaches the other side of the board.
 	public GameObject WhiteQueenPrefab { get; private set; }
 	public GameObject BlackQueenPrefab { get; private set; }
 
@@ -31,12 +32,17 @@ public class Board : NetworkBehaviour
 	public List<Chessman> WhiteChessmen { get; private set; }
 	public List<Chessman> BlackChessmen { get; private set; }
 
+	// Represents chessboard.
 	Cell[,] cells;
 	public Cell[,] GetCells()
 	{
 		return cells;
 	}
 
+	
+	/// <summary>
+	/// Which player's turn?
+	/// </summary>
 	[SyncVar]
 	bool _whiteMoves = true;
 
@@ -48,11 +54,13 @@ public class Board : NetworkBehaviour
 		}
 	}
 
+	// Some player has moved it's time for other player to move.
 	[Server]
 	public void SwapPlayer()
 	{
 		_whiteMoves = !_whiteMoves;
 	}
+
 
 	[SyncVar]
 	GameEnd _gameEnd = GameEnd.None;
@@ -85,23 +93,30 @@ public class Board : NetworkBehaviour
 		GetComponent<UI>().DisplayEndGameUI(end);
 	}
 
+	
+	/// <summary>
+	/// The physical size of the Cell in the world (in units).
+	/// Both width and height of the Cell.
+	/// </summary>
 	const int CELL_SIZE = 9;
+
+	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
+
+	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
+
 
 	public void AddQueenToList(Queen queen, bool isWhite)
 	{
 		(isWhite ? WhiteChessmen : BlackChessmen).Add(queen);
 	}
 
-	public void RemoveChessman(Chessman toRemove)
+	public void RemoveChessmanFromList(Chessman toRemove)
 	{
 		if ((toRemove.isWhite ? WhiteChessmen : BlackChessmen) != null)
 			(toRemove.isWhite ? WhiteChessmen : BlackChessmen).Remove(toRemove);
 	}
 
-	public int GetWorldPos(int boardCoordinate) { return boardCoordinate * CELL_SIZE; }
-
-	public int GetBoardPos(int worldCoordinate) { return worldCoordinate / CELL_SIZE; }
-
+	// Casts ray and gets component.
 	public TComponent GetComponentInChessman<TComponent>(int z_Board, int x_Board)
 	{
 		RaycastHit hit;
@@ -114,12 +129,14 @@ public class Board : NetworkBehaviour
 		return default(TComponent);
 	}
 
+	// Can opponent put his figure in here?
 	public bool CellIsInDanger(int y, int x, bool enemy_IsWhite)
 	{
 		return enemy_IsWhite ? WhiteChessmen.Any(whiteChessman => whiteChessman.CanKillCell(y, x))
 			: BlackChessmen.Any(blackChessman => blackChessman.CanKillCell(y, x));
 	}
 
+	// When the game starts.
 	public void Init()
 	{
 		Init_Cells();
@@ -129,6 +146,8 @@ public class Board : NetworkBehaviour
 		BlackQueenPrefab = Resources.Load("Black Queen", typeof(GameObject)) as GameObject;
 	}
 
+	// Finds all the chessmen on the board and caches them into WhiteChessmen, BlackChessmen.
+	// Also finds kings and caches them.
 	void Init_Chessmen()
 	{
 		Chessman[] chessmen = FindObjectsOfType<Chessman>();
@@ -193,6 +212,7 @@ public class Board : NetworkBehaviour
 			GetCells()[toZ, toX] |= Cell.King;
 	}
 
+	// Displays red, blue and green boxes whenever the player clicks on chessman.
 	public void DisplayHighlighters(List<Move> possibleMoves)
 	{
 		if (possibleMoves.Count() == 0)

@@ -71,6 +71,7 @@ public class Player : NetworkBehaviour
 		}
 	}
 
+	// Detects if player clicks on Highlighter.
 	void CheckAction()
 	{
 		if (!Input.GetMouseButtonDown(0))
@@ -85,9 +86,10 @@ public class Player : NetworkBehaviour
 		}
 	}
 
-	void MakeMove(int toZ, int toX)
+	// Moves selectedChessman.
+	void MakeMove(int toZ_World, int toX_World)
 	{
-		CmdMoveFigure(selectedChessman_NetworkIdentity, selectedChessman.Y_Board, selectedChessman.X_Board, toZ, toX);
+		CmdMoveFigure(selectedChessman_NetworkIdentity, selectedChessman.Y_Board, selectedChessman.X_Board, toZ_World, toX_World);
 
 		selectedChessman = null;
 		selectedChessman_NetworkIdentity = null;
@@ -179,6 +181,7 @@ public class Player : NetworkBehaviour
 		RpcMoveFigure(rook.GetComponent<NetworkIdentity>(), row, rookOldX, board.GetWorldPos(row), board.GetWorldPos(rookNewX), row == 0, false);
 	}
 
+	// Called when Pawn reaches end.
 	[Server]
 	void ServerTurnPawnIntoQueen(int fromZ_Board, int fromX_Board, int toZ_World, int toX_World, Chessman identityChessman)
 	{
