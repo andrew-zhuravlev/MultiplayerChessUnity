@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using System.Collections.Generic;
 using System.Linq;
 
+// This will be spawned as Player Object in network.
 public class Player : NetworkBehaviour
 {
 	// For performance and conveniency.
@@ -11,21 +12,29 @@ public class Player : NetworkBehaviour
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessman_NetworkIdentity;
 
+	// Start was here.
 	void Start()
 	{
+		Debug.Log("onenable");
+
 		board = Board.Instance;
 
 		if (isLocalPlayer)
 		{
 			board.Init();
 
-			FindObjectOfType<PlayerCamera>().SetDefaultPos(pointToWhite: isServer);
+			FindObjectOfType<PlayerCamera>().SetDefaultPos(pointToWhite: isServer == PlayerColorHandler.Instance.ServerPlaysAsWhite);
 		}
+	}
+
+	void OnDisable()
+	{
+		board.HideHighlighters();
 	}
 
 	void Update()
 	{
-		if (!isLocalPlayer || isServer != board.WhiteMoves)
+		if (!isLocalPlayer || (isServer == PlayerColorHandler.Instance.ServerPlaysAsWhite) != board.WhiteMoves)
 			return;
 
 		CheckSelection();
@@ -50,12 +59,12 @@ public class Player : NetworkBehaviour
 				selectedChessman = null;
 				selectedChessman_NetworkIdentity = null;
 
-				board.RemoveHighlighters();
+				board.HideHighlighters();
 			}
 
-			else if (isServer == chessmanComponent.isWhite)
+			else if ((isServer == PlayerColorHandler.Instance.ServerPlaysAsWhite) == chessmanComponent.isWhite)
 			{
-				board.RemoveHighlighters();
+				board.HideHighlighters();
 
 				selectedChessman = chessmanComponent;
 				selectedChessman_NetworkIdentity = hit.collider.GetComponent<NetworkIdentity>();
@@ -86,14 +95,14 @@ public class Player : NetworkBehaviour
 		selectedChessman = null;
 		selectedChessman_NetworkIdentity = null;
 
-		board.RemoveHighlighters();
+		board.HideHighlighters();
 	}
 
 	// TODO: Check if it was correct client.
 	[Command]
 	void CmdMoveFigure(NetworkIdentity identity, int fromZ_Board, int fromX_Board, int toZ_World, int toX_World)
 	{
-		if (NetworkServer.connections.Count != 2)
+		if (NetworkServer.connections.Count != 2 || !board.GameIsRunning())
 			return;
 
 		Chessman identityChessman = identity.GetComponent<Chessman>();

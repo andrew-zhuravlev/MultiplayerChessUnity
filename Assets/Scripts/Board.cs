@@ -5,8 +5,8 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.SceneManagement;
 
-// TODO: Randomly distribute black and white.
-// a GameManager.
+// Acts as a GameManager.
+// Responsible for ending the game, detecting who is currently moving.
 public class Board : NetworkBehaviour
 {
 	#region Singleton
@@ -54,9 +54,13 @@ public class Board : NetworkBehaviour
 		_whiteMoves = !_whiteMoves;
 	}
 
-	const int CELL_SIZE = 9;
-
+	[SyncVar]
 	GameEnd _gameEnd = GameEnd.None;
+
+	public bool GameIsRunning()
+	{
+		return _gameEnd == GameEnd.None;
+	}
 
 	[Server]
 	public void EndGame(bool? whiteIsWinner)
@@ -80,6 +84,8 @@ public class Board : NetworkBehaviour
 	{
 		GetComponent<UI>().DisplayEndGameUI(end);
 	}
+
+	const int CELL_SIZE = 9;
 
 	public void AddQueenToList(Queen queen, bool isWhite)
 	{
@@ -173,7 +179,7 @@ public class Board : NetworkBehaviour
 		}
 	}
 
-	public void FreeCell(int z, int x)
+	public void SetCellEmpty(int z, int x)
 	{
 		cells[z, x] = Cell.Empty;
 	}
@@ -238,7 +244,7 @@ public class Board : NetworkBehaviour
 		}
 	}
 
-	public void RemoveHighlighters()
+	public void HideHighlighters()
 	{
 		for (int i = 0; i < 3; i++)
 		{

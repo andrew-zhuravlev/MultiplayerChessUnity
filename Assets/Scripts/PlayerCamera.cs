@@ -32,6 +32,7 @@ public class PlayerCamera : MonoBehaviour
 		initialRot = this.transform.rotation.eulerAngles;
 	}
 
+	// Makes the camera point to the Chessmen specified in parameter.
 	public void SetDefaultPos(bool pointToWhite)
 	{
 		transform.position = pointToWhite ? initialPos : blackCameraPos;
@@ -41,7 +42,7 @@ public class PlayerCamera : MonoBehaviour
 	void Update()
 	{
 		Zoom();
-		Rotate();
+		Move();
 	}
 
 	void Zoom()
@@ -54,10 +55,9 @@ public class PlayerCamera : MonoBehaviour
 		transform.Translate(rot * Vector3.forward * Time.deltaTime * zoomSpeed, Space.Self);
 	}
 
-	void Rotate()
+	void Move()
 	{
 		Vector3 curMousePos = Input.mousePosition;
-
 		if (Input.GetMouseButton(mouseButton))
 		{
 			Vector3 delta = (curMousePos - prevMousePos).normalized;

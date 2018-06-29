@@ -3,6 +3,7 @@ using System.Linq;
 
 public class King : Chessman
 {
+	// For Castle.
 	bool hasMoved = false;
 	bool wasUnderThreat = false;
 
@@ -103,6 +104,7 @@ public class King : Chessman
 		return false;
 	}
 
+	// Chessman use this method to identify if it is valid.
 	public bool WillBeKilledAfterMove(int startY, int startX, int endY, int endX, King kingComponent)
 	{
 		Cell[,] boardAfterMove = (Cell[,])Board.Instance.GetCells().Clone();
