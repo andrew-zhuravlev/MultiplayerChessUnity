@@ -12,11 +12,8 @@ public class Player : NetworkBehaviour
 	Chessman selectedChessman;
 	NetworkIdentity selectedChessman_NetworkIdentity;
 
-	// Start was here.
 	void Start()
 	{
-		Debug.Log("onenable");
-
 		board = Board.Instance;
 
 		if (isLocalPlayer)
